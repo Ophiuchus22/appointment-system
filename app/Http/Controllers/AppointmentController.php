@@ -30,18 +30,16 @@ class AppointmentController extends Controller
                 'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]*$/', 'min:2'],
                 'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]*$/', 'min:2'],
                 'college' => 'required|string',
-                'email' => ['nullable', 'max:255'],
-                'phone_number' => ['required', 'regex:/^[0-9]{11}$/', 'max:20'],
+                'phone_number' => ['nullable', 'regex:/^[0-9]{11}$/', 'max:20'],
                 'date' => 'required|date|after_or_equal:today',
                 'time' => 'required|date_format:H:i',
-                'purpose' => 'required|string'
+                'purpose' => 'required|string',
+                'description' => 'required|string|max:1000'  // Adjust max length as needed
             ], [
                 'first_name.regex' => 'The first name must contain only letters, spaces, hyphens, and apostrophes.',
                 'first_name.min' => 'The first name must be at least 2 characters.',
                 'last_name.regex' => 'The last name must contain only letters, spaces, hyphens, and apostrophes.',
                 'last_name.min' => 'The last name must be at least 2 characters.',
-                // 'email.email' => 'Please enter a valid email address.',
-                'email.email:rfc,dns' => 'Please enter a valid email address with a valid domain.',
                 'phone_number.regex' => 'Invalid phone number',
                 'date.after_or_equal' => 'The appointment date must be today or a future date.',
                 'time.date_format' => 'Please provide a valid time in 24-hour format (HH:MM).'
@@ -64,11 +62,11 @@ class AppointmentController extends Controller
             $appointment->first_name = $validated['first_name'];
             $appointment->last_name = $validated['last_name'];
             $appointment->college = $validated['college'];
-            $appointment->email = $validated['email'] ?? null;
-            $appointment->phone_number = $validated['phone_number'];
+            $appointment->phone_number = $validated['phone_number'] ?? null;
             $appointment->date = $validated['date'];
             $appointment->time = $validated['time'];
             $appointment->purpose = $validated['purpose'];
+            $appointment->description = $validated['description'];
             $appointment->save();
 
             return redirect()->route('client.appointments.create')

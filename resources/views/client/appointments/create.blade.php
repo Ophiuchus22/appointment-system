@@ -100,12 +100,8 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">EMAIL</label>
-                                <input type="email" name="email" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">PHONE NUMBER</label>
-                                <input type="tel" name="phone_number" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
+                                <label class="block text-sm font-medium text-gray-700">PHONE NUMBER (Optional)</label>
+                                <input type="tel" name="phone_number" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
                             </div>
                         </div>
 
@@ -122,7 +118,20 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">PURPOSE OF APPOINTMENT</label>
-                            <textarea name="purpose" rows="3" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required></textarea>
+                            <select name="purpose" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
+                                <option value="">Select Purpose</option>
+                                <option value="Academic Advising">Academic Advising</option>
+                                <option value="Personal Concerns">Personal Concerns</option>
+                                <option value="Event Planning">Event Planning</option>
+                                <option value="Financial Aid">Financial Aid</option>
+                                <option value="Graduation/Transcript Requests">Graduation/Transcript Requests</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">DESCRIPTION</label>
+                            <textarea name="description" rows="3" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required></textarea>
                         </div>
 
                         <div class="space-y-2 mt-4 flex justify-end">
@@ -144,10 +153,6 @@
                             <p class="font-medium" id="summary-college"></p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Email</p>
-                            <p class="font-medium" id="summary-email"></p>
-                        </div>
-                        <div>
                             <p class="text-sm text-gray-600">Phone Number</p>
                             <p class="font-medium" id="summary-phone"></p>
                         </div>
@@ -162,6 +167,10 @@
                         <div>
                             <p class="text-sm text-gray-600">Purpose</p>
                             <p class="font-medium" id="summary-purpose"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Description</p>
+                            <p class="font-medium" id="summary-description"></p>
                         </div>
 
                         <div class="space-y-2 flex justify-between">
@@ -214,11 +223,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('summary-name').textContent = 
                 `${form.first_name.value} ${form.last_name.value}`;
             document.getElementById('summary-college').textContent = form.college.value;
-            document.getElementById('summary-email').textContent = form.email.value;
             document.getElementById('summary-phone').textContent = form.phone_number.value;
             document.getElementById('summary-date').textContent = form.date.value;
             document.getElementById('summary-time').textContent = form.time.value;
             document.getElementById('summary-purpose').textContent = form.purpose.value;
+            document.getElementById('summary-description').textContent = form.description.value;
         }
     }
 
