@@ -11,15 +11,16 @@ class AppointmentController extends Controller
 {
     public function create()
     {
-        $colleges = [
-            'COLLEGE OF ARTS AND SCIENCES',
-            'COLLEGE OF BUSINESS EDUCATION',
-            'COLLEGE OF CRIMINAL JUSTICE',
-            'COLLEGE OF ENGINEERING AND TECHNOLOGY',
-            'COLLEGE OF TEACHER EDUCATION'
-        ];
+        return view('client.appointments.create');
+    }
 
-        return view('client.appointments.create', compact('colleges'));
+    public function viewAppointment()
+    {
+        $appointments = Appointment::where('user_id', Auth::id())
+                                ->orderBy('date', 'desc')
+                                ->orderBy('time', 'desc')
+                                ->get();
+        return view('client.appointments.viewAppointment', compact('appointments'));
     }
 
     public function store(Request $request)
@@ -27,19 +28,31 @@ class AppointmentController extends Controller
         try {
             // Validate the request
             $validated = $request->validate([
-                'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]*$/', 'min:2'],
-                'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]*$/', 'min:2'],
-                'college' => 'required|string',
                 'phone_number' => ['nullable', 'regex:/^[0-9]{11}$/', 'max:20'],
                 'date' => 'required|date|after_or_equal:today',
-                'time' => 'required|date_format:H:i',
+                'time' => [
+                    'required',
+                    'date_format:H:i',
+                    function ($attribute, $value, $fail) {
+                        $time = \Carbon\Carbon::createFromFormat('H:i', $value);
+                        $hour = (int) $time->format('H');
+                        $minute = (int) $time->format('i');
+
+                        // Morning shift: 9 AM to 12 PM
+                        $isMorningShift = ($hour >= 9 && $hour < 12) || 
+                                        ($hour == 12 && $minute == 0);
+
+                        // Afternoon shift: 1 PM to 5 PM
+                        $isAfternoonShift = $hour >= 13 && $hour < 17;
+
+                        if (!$isMorningShift && !$isAfternoonShift) {
+                            $fail('Appointments are only available from 9 AM - 12 PM and 1 PM - 5 PM.');
+                        }
+                    }
+                ],
                 'purpose' => 'required|string',
                 'description' => 'required|string|max:1000'  // Adjust max length as needed
             ], [
-                'first_name.regex' => 'The first name must contain only letters, spaces, hyphens, and apostrophes.',
-                'first_name.min' => 'The first name must be at least 2 characters.',
-                'last_name.regex' => 'The last name must contain only letters, spaces, hyphens, and apostrophes.',
-                'last_name.min' => 'The last name must be at least 2 characters.',
                 'phone_number.regex' => 'Invalid phone number',
                 'date.after_or_equal' => 'The appointment date must be today or a future date.',
                 'time.date_format' => 'Please provide a valid time in 24-hour format (HH:MM).'
@@ -59,9 +72,6 @@ class AppointmentController extends Controller
             // Create the appointment
             $appointment = new Appointment();
             $appointment->user_id = Auth::id();
-            $appointment->first_name = $validated['first_name'];
-            $appointment->last_name = $validated['last_name'];
-            $appointment->college = $validated['college'];
             $appointment->phone_number = $validated['phone_number'] ?? null;
             $appointment->date = $validated['date'];
             $appointment->time = $validated['time'];

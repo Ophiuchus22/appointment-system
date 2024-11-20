@@ -13,13 +13,32 @@
 </head>
 <body class="bg-gray-100">
 
-<div class="flex justify-end p-4 pb-0"> 
-    <form action="{{ route('logout') }}" method="POST" class="flex items-center">
-        @csrf
-        <button type="submit" class="text-gray-700 hover:text-red-600 focus:outline-none py-1 px-5 border border-gray-500 rounded-md transition-colors">
-            <span class="text-l font-medium">Logout</span> 
+<!-- Dropdown Menu -->
+<div class="relative p-4 pb-0">
+    <div class="relative inline-block text-left">
+        <!-- Dropdown Button -->
+        <button id="dropdownButton" class="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none py-2 px-4 border border-gray-300 rounded-md transition-colors">
+            <span class="mr-2">Menu</span>
+            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
         </button>
-    </form>
+
+        <!-- Dropdown Content -->
+        <div id="dropdownMenu" class="hidden absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-200 opacity-0 transform -translate-y-2">
+            <div class="py-1">
+                <a href="{{ route('client.appointments.viewAppointment') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                    View Appointments
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="block">
+                    @csrf
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="toast" class="fixed right-0 top-4 transform translate-x-full transition-transform duration-300 ease-in-out z-50">
@@ -77,26 +96,6 @@
                 @csrf
                 <div class="section" id="details-section">
                     <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">FIRST NAME</label>
-                                <input type="text" name="first_name" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">LAST NAME</label>
-                                <input type="text" name="last_name" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">COLLEGE</label>
-                            <select name="college" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                                <option value="">Select College</option>
-                                @foreach($colleges as $college)
-                                    <option value="{{ $college }}">{{ $college }}</option>
-                                @endforeach
-                            </select>
-                        </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -145,14 +144,6 @@
                 <div class="section hidden" id="summary-section">
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm text-gray-600">Name</p>
-                            <p class="font-medium" id="summary-name"></p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">College</p>
-                            <p class="font-medium" id="summary-college"></p>
-                        </div>
-                        <div>
                             <p class="text-sm text-gray-600">Phone Number</p>
                             <p class="font-medium" id="summary-phone"></p>
                         </div>
@@ -192,6 +183,41 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tabIndicator = document.querySelector('.tab-indicator');
     const tabButtons = document.querySelectorAll('.tab-btn');
+    // Dropdown functionality
+    const dropdownButton = document.getElementById('dropdownButton');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const dropdownArrow = dropdownButton.querySelector('svg');
+
+    dropdownButton.addEventListener('click', () => {
+        const isHidden = dropdownMenu.classList.contains('hidden');
+        
+        if (isHidden) {
+            // Show menu
+            dropdownMenu.classList.remove('hidden');
+            setTimeout(() => {
+                dropdownMenu.classList.remove('opacity-0', '-translate-y-2');
+                dropdownArrow.classList.add('rotate-180');
+            }, 20);
+        } else {
+            // Hide menu
+            dropdownMenu.classList.add('opacity-0', '-translate-y-2');
+            dropdownArrow.classList.remove('rotate-180');
+            setTimeout(() => {
+                dropdownMenu.classList.add('hidden');
+            }, 200);
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.add('opacity-0', '-translate-y-2');
+            dropdownArrow.classList.remove('rotate-180');
+            setTimeout(() => {
+                dropdownMenu.classList.add('hidden');
+            }, 200);
+        }
+    });
     
     function updateTabIndicator(button) {
         const buttonLeft = button.offsetLeft;
@@ -220,9 +246,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update summary if showing summary section
         if (sectionId === 'summary-section') {
             const form = document.getElementById('appointment-form');
-            document.getElementById('summary-name').textContent = 
-                `${form.first_name.value} ${form.last_name.value}`;
-            document.getElementById('summary-college').textContent = form.college.value;
             document.getElementById('summary-phone').textContent = form.phone_number.value;
             document.getElementById('summary-date').textContent = form.date.value;
             document.getElementById('summary-time').textContent = form.time.value;

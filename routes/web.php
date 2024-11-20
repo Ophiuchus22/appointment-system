@@ -24,6 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('appointments')->name('client.appointments.')->group(function () {
         Route::get('/create', [AppointmentController::class, 'create'])->name('create');
         Route::post('/', [AppointmentController::class, 'store'])->name('store');
+        // Add this new route
+        Route::get('/', [AppointmentController::class, 'viewAppointment'])->name('viewAppointment'); // Add this line
     });
 });
 
