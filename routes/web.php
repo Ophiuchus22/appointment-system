@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,13 +13,7 @@ Route::get('/', function () {
 // Protected routes that require authentication
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin routes
-    Route::get('/admin/dashboard', function () {
-        // Check if user is admin
-        if (auth()->user()->role !== 'admin') {
-            return redirect('/appointments/create');
-        }
-        return view('admin_side.dashboard');
-    });
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('admin.dashboard');
 
     // Dashboard redirect based on role
     Route::get('/dashboard', function () {
