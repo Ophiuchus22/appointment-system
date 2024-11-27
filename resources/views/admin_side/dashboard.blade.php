@@ -20,7 +20,7 @@
                     <div class="bg-white rounded-xl shadow-lg">
                         <!-- Legend -->
                         <div class="p-3 border-b">
-                            <div class="flex flex-wrap gap-3 text-xs">
+                            <div class="flex flex-wrap gap-3 text-s">
                                 <div class="flex items-center gap-2">
                                     <div class="w-3 h-3 rounded-sm bg-amber-50 border border-amber-200"></div>
                                     <span class="text-amber-700">Pending</span>
