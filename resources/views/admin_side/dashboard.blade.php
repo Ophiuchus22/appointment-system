@@ -12,11 +12,11 @@
         @include('admin_side.sidebar')
 
         <div class="flex-1 p-4">
-            <h1 class="text-2xl font-bold mb-6 text-gray-800">Dashboard</h1>
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
             
             <div class="flex gap-2">
                 <!-- Left Side - Calendar -->
-                <div class="w-3/5">
+                <div class="w-2/3">
                     <div class="bg-white rounded-xl shadow-lg">
                         <!-- Legend -->
                         <div class="p-3 border-b">
@@ -65,7 +65,7 @@
                         <!-- Calendar Body -->
                         <div class="grid grid-cols-7 gap-px bg-gray-100">
                             @foreach($calendar as $day)
-                                <div class="min-h-[100px] max-h-[120px] overflow-y-auto bg-white p-2 relative group hover:bg-gray-50 transition-colors">
+                                <div class="min-h-[90px] max-h-[120px] overflow-y-auto bg-white p-2 relative group hover:bg-gray-50 transition-colors">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-sm font-medium {{ $day['date']->isToday() ? 'text-blue-600' : 'text-gray-700' }} 
                                             {{ in_array($day['date']->dayOfWeek, [0, 6]) ? 'text-gray-400' : '' }}">
@@ -96,7 +96,7 @@
                 </div>
 
                 <!-- Right Side - Empty Space for Future Content -->
-                <div class="w-2/5 bg-white rounded-xl shadow-lg p-4">
+                <div class="w-1/3 bg-white rounded-xl shadow-lg p-4">
                     <!-- Your future content will go here -->
                 </div>
             </div>
