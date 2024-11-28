@@ -46,35 +46,10 @@ class DashboardController extends Controller
             $currentDate->addDay();
         }
         
-        // Get summary appointments
-        $upcomingAppointments = Appointment::where('date', '>=', today())
-            ->where('status', 'pending')
-            ->orderBy('date')
-            ->orderBy('time')
-            ->take(3)
-            ->get();
-            
-        $pendingAppointments = Appointment::where('status', 'pending')
-            ->orderBy('date')
-            ->orderBy('time')
-            ->take(3)
-            ->get();
-            
-        $completedAppointments = Appointment::where('status', 'completed')
-            ->orderBy('date', 'desc')
-            ->orderBy('time', 'desc')
-            ->take(3)
-            ->get();
-        
         if ($request->ajax()) {
             return view('admin_side.dashboard', compact('calendar'))->render();
         }
         
-        return view('admin_side.dashboard', compact(
-            'calendar',
-            'upcomingAppointments',
-            'pendingAppointments',
-            'completedAppointments'
-        ));
+        return view('admin_side.dashboard', compact('calendar'));
     }
 }
