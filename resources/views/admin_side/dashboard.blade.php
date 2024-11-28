@@ -12,7 +12,7 @@
         @include('admin_side.sidebar')
 
         <div class="flex-1 p-4">
-            <h1 class="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
+            <h1 class="text-3xl font-bold mb-4 text-gray-800">Dashboard</h1>
             
             <div class="flex gap-2">
                 <!-- Left Side - Calendar -->
@@ -64,40 +64,110 @@
                         
                         <!-- Calendar Body -->
                         <div class="grid grid-cols-7 gap-px bg-gray-100">
-                            @foreach($calendar as $day)
-                                <div class="min-h-[90px] max-h-[120px] overflow-y-auto bg-white p-2 relative group hover:bg-gray-50 transition-colors">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="text-sm font-medium {{ $day['date']->isToday() ? 'text-blue-600' : 'text-gray-700' }} 
-                                            {{ in_array($day['date']->dayOfWeek, [0, 6]) ? 'text-gray-400' : '' }}">
-                                            {{ $day['date']->format('j') }}
-                                        </span>
-                                        @if($day['date']->isToday())
-                                            <span class="text-xs px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800">Today</span>
-                                        @endif
-                                    </div>
-                                    
-                                    <div class="space-y-1">
-                                        @foreach($day['appointments'] as $appointment)
-                                            <div class="rounded-md p-1.5 text-xs transition-all hover:transform hover:scale-102
-                                                {{ $appointment->status === 'pending' ? 'bg-amber-50 text-amber-700 border border-amber-200' : '' }}
-                                                {{ $appointment->status === 'confirmed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}
-                                                {{ $appointment->status === 'completed' ? 'bg-blue-50 text-blue-700 border border-blue-200' : '' }}
-                                                {{ $appointment->status === 'cancelled' ? 'bg-red-50 text-red-700 border border-red-200' : '' }}">
-                                                <div class="font-medium">{{ Carbon\Carbon::parse($appointment->time)->format('h:i A') }}</div>
-                                                <div class="truncate text-xs">{{ $appointment->purpose }}</div>
-                                                <div class="text-xs opacity-75 capitalize">{{ $appointment->status }}</div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
+                            @include('admin_side.dashboard_calendar_grid', ['calendar' => $calendar])
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side - Empty Space for Future Content -->
-                <div class="w-1/3 bg-white rounded-xl shadow-lg p-4">
-                    <!-- Your future content will go here -->
+                <!-- Right Side - Combined Stats and Activity -->
+                <div class="w-1/3 space-y-4">
+                    <!-- Appointments Overview - Compact Version -->
+                    <div class="bg-white rounded-xl shadow-lg p-4">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-3">Appointments Overview</h2>
+                        
+                        <div class="grid gap-3">
+                            <!-- Upcoming -->
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-blue-500/10 p-2 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-blue-900">Upcoming</h3>
+                                        <div class="flex items-baseline">
+                                            <span class="text-2xl font-bold text-blue-600">{{ $upcomingCount }}</span>
+                                            <span class="ml-1 text-xs text-blue-600/70">appointments</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pending -->
+                            <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-3 border border-amber-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-amber-500/10 p-2 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-amber-900">Pending</h3>
+                                        <div class="flex items-baseline">
+                                            <span class="text-2xl font-bold text-amber-600">{{ $pendingCount }}</span>
+                                            <span class="ml-1 text-xs text-amber-600/70">appointments</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Completed -->
+                            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-3 border border-emerald-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-emerald-500/10 p-2 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-emerald-900">Completed</h3>
+                                        <div class="flex items-baseline">
+                                            <span class="text-2xl font-bold text-emerald-600">{{ $completedCount }}</span>
+                                            <span class="ml-1 text-xs text-emerald-600/70">appointments</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity - Compact Version -->
+                    <div class="bg-white rounded-xl shadow-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
+                            <a href="#" class="text-xs text-blue-600 hover:underline">View All</a>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            @foreach($recentActivities->take(3) as $activity)
+                                <div class="flex items-start space-x-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                                    <div class="mt-1">
+                                        @if($activity['type'] === 'appointment')
+                                            <div class="p-1.5 bg-blue-50 rounded-lg">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 011 1v3h3a1 1 0 110 2H6a1 1 0 01-1-1V8a1 1 0 011-1z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs text-gray-800">
+                                            <span class="font-medium">{{ $activity['user'] }}</span> 
+                                            {{ $activity['action'] }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-0.5">{{ $activity['time'] }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            @if(count($recentActivities) === 0)
+                                <div class="text-center py-4 text-gray-500 text-sm">
+                                    No recent activity
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -117,14 +187,7 @@
             })
             .then(response => response.text())
             .then(html => {
-                const parser = new DOMParser();
-                const newContent = parser.parseFromString(html, 'text/html')
-                    .querySelector('.bg-white.rounded-xl.shadow-lg');
-                
-                if (newContent) {
-                    document.querySelector('.bg-white.rounded-xl.shadow-lg').outerHTML = newContent.outerHTML;
-                }
-                
+                document.querySelector('.grid.grid-cols-7.bg-gray-100').innerHTML = html;
                 document.getElementById('currentMonth').textContent = currentDate.format('MMMM YYYY');
             })
             .catch(error => console.error('Error updating calendar:', error));
@@ -137,9 +200,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentMonth').textContent = currentDate.format('MMMM YYYY');
+            updateCalendar();
         });
-
-        updateCalendar();
     </script>
 </body>
 </html>

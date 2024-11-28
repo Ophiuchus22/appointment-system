@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -55,6 +56,9 @@ class DashboardController extends Controller
         
         $pendingCount = Appointment::where('status', 'pending')->count();
         $completedCount = Appointment::where('status', 'completed')->count();
+
+        // Get recent activities
+        $recentActivities = $this->getRecentActivities();
         
         // Check if it's an AJAX request
         if ($request->ajax()) {
@@ -67,7 +71,50 @@ class DashboardController extends Controller
             'calendar',
             'upcomingCount',
             'pendingCount',
-            'completedCount'
+            'completedCount',
+            'recentActivities'
         ));
+    }
+
+    private function getRecentActivities()
+    {
+        // Get appointments with their associated users, ordered by latest first
+        $activities = Appointment::with('user')
+            ->orderBy('created_at', 'desc')
+            ->orWhere('updated_at', '>', 'created_at')  // Include updated appointments
+            ->limit(10)  // Limit to 10 most recent activities
+            ->get()
+            ->map(function ($appointment) {
+                $activity = [
+                    'type' => 'appointment',
+                    'user' => $appointment->user->name,
+                    'time' => Carbon::parse(
+                        max($appointment->created_at, $appointment->updated_at)
+                    )->diffForHumans()
+                ];
+
+                // Determine the action based on timestamps and status
+                if ($appointment->created_at->eq($appointment->updated_at)) {
+                    $activity['action'] = 'created an appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
+                } else {
+                    switch ($appointment->status) {
+                        case 'confirmed':
+                            $activity['action'] = 'confirmed their appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
+                            break;
+                        case 'completed':
+                            $activity['action'] = 'completed their appointment';
+                            break;
+                        case 'cancelled':
+                            $activity['action'] = 'cancelled their appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
+                            break;
+                        default:
+                            $activity['action'] = 'updated their appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
+                    }
+                }
+
+                return $activity;
+            });
+
+        return $activities;
     }
 }

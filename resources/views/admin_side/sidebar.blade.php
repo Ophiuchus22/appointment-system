@@ -5,9 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Sidebar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: -256px; /* w-64 = 256px */
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+        }
+
+        .sidebar.active {
+            transform: translateX(256px);
+        }
+
+        .sidebar-trigger {
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 48px;
+            background: #1f2937;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 0 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .edge-trigger {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 100vh;
+            z-index: 40;
+        }
+
+        .sidebar.active .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        .chevron-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
 </head>
 <body>
-    <div class="bg-gradient-to-b from-gray-800 to-gray-900 text-white w-64 min-h-screen p-4 shadow-lg transition-all duration-300">
+    <!-- Added edge trigger div -->
+    <div id="edge-trigger" class="edge-trigger"></div>
+
+    <div id="sidebar" class="sidebar bg-gradient-to-b from-gray-800 to-gray-900 text-white w-64 min-h-screen p-4 shadow-lg">
+        <div class="sidebar-trigger">
+            <svg class="chevron-icon w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+
         <!-- Admin Header -->
         <div class="flex items-center space-x-4 mb-8 p-2">
             <div>
@@ -63,5 +117,69 @@
             </form>
         </nav>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const trigger = sidebar.querySelector('.sidebar-trigger');
+            const edgeTrigger = document.getElementById('edge-trigger');
+            let isDragging = false;
+            let startX;
+            let sidebarLeft;
+
+            // Toggle sidebar on trigger click
+            trigger.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+            // Function to handle drag start
+            function handleDragStart(e) {
+                isDragging = true;
+                startX = e.clientX;
+                sidebarLeft = sidebar.getBoundingClientRect().left;
+                // Prevent text selection while dragging
+                e.preventDefault();
+            }
+
+            // Add mousedown listeners to both sidebar and edge trigger
+            sidebar.addEventListener('mousedown', handleDragStart);
+            edgeTrigger.addEventListener('mousedown', handleDragStart);
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+
+                const dragDistance = e.clientX - startX;
+                
+                // If dragging right and sidebar is closed
+                if (dragDistance > 50 && !sidebar.classList.contains('active')) {
+                    sidebar.classList.add('active');
+                }
+                // If dragging left and sidebar is open
+                else if (dragDistance < -50 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            // Handle hover functionality
+            sidebar.addEventListener('mouseenter', () => {
+                sidebar.classList.add('active');
+            });
+
+            edgeTrigger.addEventListener('mouseenter', () => {
+                sidebar.classList.add('active');
+            });
+
+            // Only close on mouseleave if we're not dragging
+            sidebar.addEventListener('mouseleave', () => {
+                if (!isDragging) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
