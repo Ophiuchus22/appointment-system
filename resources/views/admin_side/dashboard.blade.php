@@ -95,9 +95,77 @@
                     </div>
                 </div>
 
-                <!-- Right Side - Empty Space for Future Content -->
-                <div class="w-1/3 bg-white rounded-xl shadow-lg p-4">
-                    <!-- Your future content will go here -->
+                <!-- Right Side - Appointment Summaries -->
+                <div class="w-1/3 space-y-4">
+                    <!-- Upcoming Appointments -->
+                    <div class="bg-white rounded-xl shadow-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Upcoming Appointments</h3>
+                        <div class="space-y-2">
+                            @php
+                                $upcomingAppointments = $appointment->where('date', '>=', today())
+                                    ->where('status', 'pending')
+                                    ->take(3);
+                            @endphp
+                            
+                            @forelse($upcomingAppointments as $appointment)
+                                <div class="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                                    <div class="font-medium text-sm">{{ $appointment->purpose }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        {{ Carbon\Carbon::parse($appointment->date)->format('M j') }} at 
+                                        {{ Carbon\Carbon::parse($appointment->time)->format('g:i A') }}
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500 text-center py-2">No upcoming appointments</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Pending Appointments -->
+                    <div class="bg-white rounded-xl shadow-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Pending Appointments</h3>
+                        <div class="space-y-2">
+                            @php
+                                $pendingAppointments = $appointment->where('status', 'pending')
+                                    ->take(3);
+                            @endphp
+                            
+                            @forelse($pendingAppointments as $appointment)
+                                <div class="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                                    <div class="font-medium text-sm">{{ $appointment->purpose }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        {{ Carbon\Carbon::parse($appointment->date)->format('M j') }} at 
+                                        {{ Carbon\Carbon::parse($appointment->time)->format('g:i A') }}
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500 text-center py-2">No pending appointments</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Completed Appointments -->
+                    <div class="bg-white rounded-xl shadow-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Completed Appointments</h3>
+                        <div class="space-y-2">
+                            @php
+                                $completedAppointments = $appointment->where('status', 'completed')
+                                    ->take(3);
+                            @endphp
+                            
+                            @forelse($completedAppointments as $appointment)
+                                <div class="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                                    <div class="font-medium text-sm">{{ $appointment->purpose }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        {{ Carbon\Carbon::parse($appointment->date)->format('M j') }} at 
+                                        {{ Carbon\Carbon::parse($appointment->time)->format('g:i A') }}
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500 text-center py-2">No completed appointments</p>
+                            @endforelse
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
