@@ -45,11 +45,29 @@ class DashboardController extends Controller
             ];
             $currentDate->addDay();
         }
+
+        // Get counts for each category
+        $now = Carbon::now();
         
+        $upcomingCount = Appointment::where('date', '>=', $now->toDateString())
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->count();
+        
+        $pendingCount = Appointment::where('status', 'pending')->count();
+        $completedCount = Appointment::where('status', 'completed')->count();
+        
+        // Check if it's an AJAX request
         if ($request->ajax()) {
-            return view('admin_side.dashboard', compact('calendar'))->render();
+            // Return only the calendar grid HTML
+            return view('admin_side.dashboard_calendar_grid', compact('calendar'))->render();
         }
         
-        return view('admin_side.dashboard', compact('calendar'));
+        // Return full dashboard view
+        return view('admin_side.dashboard', compact(
+            'calendar',
+            'upcomingCount',
+            'pendingCount',
+            'completedCount'
+        ));
     }
 }
