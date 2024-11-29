@@ -18,8 +18,9 @@
                 <!-- Left Side - Calendar -->
                 <div class="w-2/3">
                     <div class="bg-white rounded-xl shadow-lg">
-                        <!-- Legend -->
-                        <div class="p-3 border-b">
+                        <!-- Legend and View Switcher -->
+                        <div class="p-3 border-b flex justify-between items-center">
+                            <!-- Left side - Legend -->
                             <div class="flex flex-wrap gap-3 text-s">
                                 <div class="flex items-center gap-2">
                                     <div class="w-3 h-3 rounded-sm bg-amber-50 border border-amber-200"></div>
@@ -36,6 +37,19 @@
                                 <div class="flex items-center gap-2">
                                     <div class="w-3 h-3 rounded-sm bg-red-50 border border-red-200"></div>
                                     <span class="text-red-700">Cancelled</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Right side - View Switcher -->
+                            <div class="relative">
+                                <select id="viewType" class="pl-3 pr-8 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white">
+                                    <option value="month">Month View</option>
+                                    <option value="week">Week View</option>
+                                </select>
+                                <div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -140,7 +154,7 @@
                         </div>
                         
                         <div class="space-y-3">
-                            @foreach($recentActivities->take(3) as $activity)
+                            @foreach($recentActivities->take(4) as $activity)
                                 <div class="flex items-start space-x-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
                                     <div class="mt-1">
                                         @if($activity['type'] === 'appointment')
@@ -175,12 +189,19 @@
 
     <script>
         let currentDate = moment();
+        let currentView = 'month';
 
         function updateCalendar() {
-            const year = currentDate.year();
-            const month = currentDate.month() + 1;
+            const view = document.getElementById('viewType').value;
+            let params;
 
-            fetch(`/admin/dashboard?month=${month}&year=${year}`, {
+            if (view === 'week') {
+                params = `week=${currentDate.format('YYYY-MM-DD')}&view=${view}`;
+            } else {
+                params = `month=${currentDate.month() + 1}&year=${currentDate.year()}&view=${view}`;
+            }
+
+            fetch(`/admin/dashboard?${params}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -188,18 +209,41 @@
             .then(response => response.text())
             .then(html => {
                 document.querySelector('.grid.grid-cols-7.bg-gray-100').innerHTML = html;
-                document.getElementById('currentMonth').textContent = currentDate.format('MMMM YYYY');
+                updateHeaderText();
             })
             .catch(error => console.error('Error updating calendar:', error));
         }
 
+        function updateHeaderText() {
+            const view = document.getElementById('viewType').value;
+            if (view === 'week') {
+                const weekStart = currentDate.clone().startOf('week').format('MMM D');
+                const weekEnd = currentDate.clone().endOf('week').format('MMM D, YYYY');
+                document.getElementById('currentMonth').textContent = `${weekStart} - ${weekEnd}`;
+            } else {
+                document.getElementById('currentMonth').textContent = currentDate.format('MMMM YYYY');
+            }
+        }
+
         function changeMonth(direction) {
-            currentDate.add(direction, 'month');
+            const view = document.getElementById('viewType').value;
+            if (view === 'week') {
+                currentDate.add(direction, 'weeks');
+            } else {
+                currentDate.add(direction, 'months');
+            }
             updateCalendar();
         }
 
+        document.getElementById('viewType').addEventListener('change', function() {
+            currentView = this.value;
+            // Reset to current week/month when switching views
+            currentDate = moment();
+            updateCalendar();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('currentMonth').textContent = currentDate.format('MMMM YYYY');
+            updateHeaderText();
             updateCalendar();
         });
     </script>

@@ -95,46 +95,75 @@
             <form id="appointment-form" action="{{ route('client.appointments.store') }}" method="POST">
                 @csrf
                 <div class="section" id="details-section">
-                    <div class="space-y-4">
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">PHONE NUMBER (Optional)</label>
-                                <input type="tel" name="phone_number" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <div class="space-y-6">
+                        <!-- Phone Number - Single Column -->
+                        <div class="max-w-md">
+                            <label class="block text-sm font-medium text-gray-600">Phone Number</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="tel" 
+                                    name="phone_number" 
+                                    placeholder="(Optional)"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <!-- Date and Time - Two Columns -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">DATE</label>
-                                <input type="date" name="date" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
+                                <label class="block text-sm font-medium text-gray-600">Date</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <input type="date" 
+                                        name="date" 
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                        required>
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">TIME</label>
-                                <input type="time" name="time" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
+                                <label class="block text-sm font-medium text-gray-600">Time</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <input type="time" 
+                                        name="time" 
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" 
+                                        required>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Purpose - Single Column -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">PURPOSE OF APPOINTMENT</label>
-                            <select name="purpose" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                                <option value="">Select Purpose</option>
-                                <option value="Academic Advising">Academic Advising</option>
-                                <option value="Personal Concerns">Personal Concerns</option>
-                                <option value="Event Planning">Event Planning</option>
-                                <option value="Financial Aid">Financial Aid</option>
-                                <option value="Graduation/Transcript Requests">Graduation/Transcript Requests</option>
-                                <option value="Other">Other</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-600">Purpose</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <select name="purpose" 
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white" 
+                                    required>
+                                    <option value="">Select purpose</option>
+                                    <option value="Academic Advising">Academic Advising</option>
+                                    <option value="Personal Concerns">Personal Concerns</option>
+                                    <option value="Event Planning">Event Planning</option>
+                                    <option value="Financial Aid">Financial Aid</option>
+                                    <option value="Graduation/Transcript Requests">Documents Request</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
                         </div>
 
+                        <!-- Description - Single Column -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">DESCRIPTION</label>
-                            <textarea name="description" rows="3" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required></textarea>
+                            <label class="block text-sm font-medium text-gray-600">Description</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <textarea name="description" 
+                                    rows="3" 
+                                    placeholder="Please provide details about your appointment..."
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none" 
+                                    required></textarea>
+                            </div>
                         </div>
 
-                        <div class="space-y-2 mt-4 flex justify-end">
-                            <button type="button" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors" onclick="showSection('summary-section')">
+                        <!-- Next Button -->
+                        <div class="flex justify-end pt-4">
+                            <button type="button" 
+                                class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium" 
+                                onclick="showSection('summary-section')">
                                 Next
                             </button>
                         </div>
@@ -142,33 +171,49 @@
                 </div>
 
                 <div class="section hidden" id="summary-section">
-                    <div class="space-y-4">
-                        <div>
-                            <p class="text-sm text-gray-600">Phone Number</p>
-                            <p class="font-medium" id="summary-phone"></p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Date</p>
-                            <p class="font-medium" id="summary-date"></p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Time</p>
-                            <p class="font-medium" id="summary-time"></p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Purpose</p>
-                            <p class="font-medium" id="summary-purpose"></p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Description</p>
-                            <p class="font-medium" id="summary-description"></p>
+                    <div class="space-y-6">
+                        <!-- Summary Card -->
+                        <div class="bg-gray-50 rounded-lg p-6 space-y-4 border border-gray-100">
+                            <!-- Phone Number -->
+                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                                <p class="text-sm font-medium text-gray-500">Phone Number</p>
+                                <p class="col-span-2 text-base text-gray-900" id="summary-phone">
+                                    <span class="text-gray-400 italic text-sm">Not provided</span>
+                                </p>
+                            </div>
+
+                            <!-- Date & Time -->
+                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                                <p class="text-sm font-medium text-gray-500">Schedule</p>
+                                <div class="col-span-2 flex gap-2 text-base text-gray-900">
+                                    <span id="summary-date"></span>
+                                    <span class="text-gray-400">|</span>
+                                    <span id="summary-time"></span>
+                                </div>
+                            </div>
+
+                            <!-- Purpose -->
+                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                                <p class="text-sm font-medium text-gray-500">Purpose</p>
+                                <p class="col-span-2 text-base text-gray-900" id="summary-purpose"></p>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                                <p class="text-sm font-medium text-gray-500">Description</p>
+                                <p class="col-span-2 text-base text-gray-900 whitespace-pre-line" id="summary-description"></p>
+                            </div>
                         </div>
 
-                        <div class="space-y-2 flex justify-between">
-                            <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors" onclick="showSection('details-section')">
-                                Back
+                        <!-- Action Buttons -->
+                        <div class="flex justify-between items-center pt-4">
+                            <button type="button" 
+                                class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all duration-200 font-medium" 
+                                onclick="showSection('details-section')">
+                                Back to Details
                             </button>
-                            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                            <button type="submit" 
+                                class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium">
                                 Confirm Appointment
                             </button>
                         </div>

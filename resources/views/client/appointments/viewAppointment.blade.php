@@ -55,6 +55,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -93,6 +94,39 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-500">
                                         {{ $appointment->phone_number ?? 'Not provided' }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            @if($appointment->status === 'pending')
+                                                <button type="button"
+                                                        onclick='openEditModal(@json($appointment))'
+                                                        class="text-blue-600 hover:text-blue-800 font-medium">
+                                                    Edit
+                                                </button>
+                                            @endif
+                                            
+                                            @if(in_array($appointment->status, ['pending', 'approved']))
+                                                <form action="{{ route('client.appointments.cancel', $appointment) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="text-yellow-600 hover:text-yellow-800" 
+                                                            onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                                        Cancel
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            
+                                            @if(in_array($appointment->status, ['cancelled', 'rejected']))
+                                                <form action="{{ route('client.appointments.destroy', $appointment) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-800"
+                                                            onclick="return confirm('Are you sure you want to delete this appointment? This action cannot be undone.')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -140,5 +174,7 @@
             });
         });
     </script>
+
+    @include('client.appointments.Modals.editModal')
 </body>
 </html>

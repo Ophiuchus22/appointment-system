@@ -16,29 +16,37 @@ class DashboardController extends Controller
             return redirect('/appointments/create');
         }
 
-        // Get requested month/year or use current date
+        $viewType = $request->input('view', 'month');
         $date = Carbon::now();
-        if ($request->has('month') && $request->has('year')) {
+        
+        if ($viewType === 'week' && $request->has('week')) {
+            // Parse the specific week date
+            $date = Carbon::parse($request->week);
+        } elseif ($request->has('month') && $request->has('year')) {
+            // Parse the specific month
             $date = Carbon::createFromDate($request->year, $request->month, 1);
         }
 
-        $startOfMonth = $date->copy()->startOfMonth()->startOfWeek(Carbon::SUNDAY);
-        $endOfMonth = $date->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
-        
-        // Get all appointments for the displayed date range
-        $appointments = Appointment::whereBetween('date', [$startOfMonth, $endOfMonth])
+        if ($viewType === 'week') {
+            $startDate = $date->copy()->startOfWeek(Carbon::SUNDAY);
+            $endDate = $date->copy()->endOfWeek(Carbon::SATURDAY);
+        } else {
+            $startDate = $date->copy()->startOfMonth()->startOfWeek(Carbon::SUNDAY);
+            $endDate = $date->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
+        }
+
+        $appointments = Appointment::whereBetween('date', [$startDate, $endDate])
             ->orderBy('date')
             ->orderBy('time')
             ->get()
             ->groupBy(function($appointment) {
                 return Carbon::parse($appointment->date)->format('Y-m-d');
             });
-        
-        // Generate calendar data
+
         $calendar = [];
-        $currentDate = $startOfMonth->copy();
+        $currentDate = $startDate->copy();
         
-        while ($currentDate <= $endOfMonth) {
+        while ($currentDate <= $endDate) {
             $dateKey = $currentDate->format('Y-m-d');
             $calendar[] = [
                 'date' => $currentDate->copy(),
@@ -63,7 +71,9 @@ class DashboardController extends Controller
         // Check if it's an AJAX request
         if ($request->ajax()) {
             // Return only the calendar grid HTML
-            return view('admin_side.Extensions.dashboard_calendar_grid', compact('calendar'))->render();
+            return view('admin_side.Extensions.dashboard_calendar_grid', 
+                compact('calendar', 'viewType')
+            )->render();
         }
         
         // Return full dashboard view
@@ -72,7 +82,8 @@ class DashboardController extends Controller
             'upcomingCount',
             'pendingCount',
             'completedCount',
-            'recentActivities'
+            'recentActivities',
+            'viewType'
         ));
     }
 
