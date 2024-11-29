@@ -136,6 +136,31 @@
         @include('admin_side.Modals.edit_user_modal')
 
     <script>
+        // Add this at the beginning of your script section
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle success message
+            const successMessage = document.getElementById('success-message');
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.classList.add('fade-out');
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 500); // Wait for fade animation to complete
+                }, 3000);
+            }
+
+            // Handle error message
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.classList.add('fade-out');
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 500); // Wait for fade animation to complete
+                }, 3000);
+            }
+        });
+
         // Modal management functions
     function openAddUserModal() {
         document.getElementById('addUserModal').classList.remove('hidden');
@@ -168,13 +193,18 @@
                 document.getElementById('edit_user_name').value = user.name;
                 document.getElementById('edit_user_email').value = user.email;
                 
-                // Handle college field visibility
-                const collegeSelect = document.getElementById('edit_user_college');
+                // Handle college field visibility and value
+                const collegeField = document.getElementById('edit_user_college');
+                const collegeContainer = collegeField.parentElement;
+                
                 if (userRole === 'user') {
-                    collegeSelect.parentElement.style.display = 'block';
-                    collegeSelect.value = user.college;
+                    collegeContainer.style.display = 'block';
+                    collegeField.value = user.college;
+                    collegeField.required = true;  // Make college required for users
                 } else {
-                    collegeSelect.parentElement.style.display = 'none';
+                    collegeContainer.style.display = 'none';
+                    collegeField.value = '';  // Clear the value for admins
+                    collegeField.required = false;  // Remove required attribute for admins
                 }
                 
                 // Show the modal

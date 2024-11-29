@@ -13,32 +13,82 @@
 </head>
 <body class="bg-gray-100">
 
-<!-- Dropdown Menu -->
-<div class="relative p-4 pb-0">
-    <div class="relative inline-block text-left">
-        <!-- Dropdown Button -->
-        <button id="dropdownButton" class="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none py-2 px-4 border border-gray-300 rounded-md transition-colors">
-            <span class="mr-2">Menu</span>
-            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-        </button>
+<!-- Top Navigation Bar -->
+<div class="w-full bg-white border-b border-gray-100 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Left side - Logo or Title -->
+        <div>
+            <h1 class="text-xl font-semibold text-gray-800">Appointment System</h1>
+        </div>
 
-        <!-- Dropdown Content -->
-        <div id="dropdownMenu" class="hidden absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-200 opacity-0 transform -translate-y-2">
-            <div class="py-1">
-                <a href="{{ route('client.appointments.viewAppointment') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                    View Appointments
-                </a>
-                <form action="{{ route('logout') }}" method="POST" class="block">
-                    @csrf
-                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                        Logout
-                    </button>
-                </form>
+        <!-- Right side - Dropdown Menu -->
+        <div class="relative">
+            <button id="dropdownButton" class="flex items-center gap-2 bg-white px-4 py-2.5 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 active:bg-gray-100 transition-all duration-200 group">
+                <!-- User Avatar/Icon -->
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                
+                <span class="font-medium text-gray-700 group-hover:text-gray-900">Account</span>
+                <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <!-- Dropdown Content -->
+            <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 border border-gray-100 transition-all duration-200 opacity-0 transform -translate-y-2 z-50">
+                <!-- User Info Section -->
+                <div class="px-4 py-3 border-b border-gray-100">
+                    <p class="text-sm font-medium text-gray-900">{{ Auth::user()->name ?? 'Guest' }}</p>
+                    <p class="text-sm text-gray-500 truncate">{{ Auth::user()->email ?? '' }}</p>
+                </div>
+                
+                <div class="py-1">
+                    <!-- View Appointments -->
+                    <a href="{{ route('client.appointments.viewAppointment') }}" 
+                       class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        View Appointments
+                    </a>
+                    
+                    <!-- Logout -->
+                    <form action="{{ route('logout') }}" method="POST" class="block">
+                        @csrf
+                        <button type="submit" 
+                                class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- College Logo -->
+<div class="fixed bottom-4 right-4 opacity-60">
+    @php
+        $college = Auth::user()->college ?? 'default';
+        $logos = [
+            'COLLEGE OF TEACHER EDUCATION' => 'cte.png',
+            'COLLEGE OF CRIMINAL JUSTICE' => 'ccj.png',
+            'COLLEGE OF BUSINESS EDUCATION' => 'cbe.png',
+            'COLLEGE OF ARTS AND SCIENCES' => 'cas.png',
+        ];
+        $logoFile = $logos[$college] ?? 'default.png';
+        $logoPath = public_path('logo/' . $logoFile);
+    @endphp
+    
+    @if(file_exists($logoPath))
+        <img src="{{ asset('logo/' . $logoFile) }}" alt="College Logo" class="w-32 h-32">
+    @endif
 </div>
 
 <div id="toast" class="fixed right-0 top-4 transform translate-x-full transition-transform duration-300 ease-in-out z-50">
