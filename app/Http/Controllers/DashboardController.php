@@ -63,7 +63,7 @@ class DashboardController extends Controller
         // Check if it's an AJAX request
         if ($request->ajax()) {
             // Return only the calendar grid HTML
-            return view('admin_side.dashboard_calendar_grid', compact('calendar'))->render();
+            return view('admin_side.Extensions.dashboard_calendar_grid', compact('calendar'))->render();
         }
         
         // Return full dashboard view

@@ -64,7 +64,7 @@
                         
                         <!-- Calendar Body -->
                         <div class="grid grid-cols-7 gap-px bg-gray-100">
-                            @include('admin_side.dashboard_calendar_grid', ['calendar' => $calendar])
+                            @include('admin_side.Extensions.dashboard_calendar_grid', ['calendar' => $calendar])
                         </div>
                     </div>
                 </div>
