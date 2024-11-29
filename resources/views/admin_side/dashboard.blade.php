@@ -150,7 +150,12 @@
                     <div class="bg-white rounded-xl shadow-lg p-4">
                         <div class="flex justify-between items-center mb-3">
                             <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
-                            <a href="#" class="text-xs text-blue-600 hover:underline">View All</a>
+                            <button 
+                                onclick="openViewAllActivitiesModal()" 
+                                class="text-sm text-blue-600 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                            >
+                                View All
+                            </button>
                         </div>
                         
                         <div class="space-y-3">
@@ -247,5 +252,8 @@
             updateCalendar();
         });
     </script>
+
+    <!-- Include the modal at the bottom of your dashboard file -->
+    @include('admin_side.Modals.view_all_activities_modal')
 </body>
 </html>
