@@ -9,8 +9,8 @@
 </head>
 <body class="bg-gray-50">
     <div class="flex">
-        @include('admin_side.sidebar')
-
+        @include('layouts.sidebar')
+        
         <div class="flex-1 p-4">
             <h1 class="text-3xl font-bold mb-4 text-gray-800">Dashboard</h1>
             

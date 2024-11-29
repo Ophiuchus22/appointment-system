@@ -17,7 +17,7 @@
             transform: translateX(256px);
         }
 
-        .sidebar-trigger {
+        /* .sidebar-trigger {
             position: absolute;
             right: -12px;
             top: 50%;
@@ -31,7 +31,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 4px 0 6px rgba(0, 0, 0, 0.1);
-        }
+        } */
 
         .edge-trigger {
             position: fixed;
@@ -57,9 +57,9 @@
 
     <div id="sidebar" class="sidebar bg-gradient-to-b from-gray-800 to-gray-900 text-white w-64 min-h-screen p-4 shadow-lg">
         <div class="sidebar-trigger">
-            <svg class="chevron-icon w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- <svg class="chevron-icon w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
+            </svg> -->
         </div>
 
         <!-- Admin Header -->

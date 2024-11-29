@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-100">
         <div class="flex">
-            @include('admin_side.sidebar')
+            @include('layouts.sidebar')
 
             <!-- Main Content -->
             <div class="flex-1 p-8">
