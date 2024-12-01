@@ -1,46 +1,302 @@
-<x-guest-layout>
-    <!-- Custom Welcome Text -->
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold text-gray-900">Welcome</h1>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config('app.name') }} - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #3949ab;
+            --text-color: #263238;
+            --light-text: #546e7a;
+            --background-color: #f5f5f5;
+            --error-color: #c62828;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background-color);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .login-image {
+            display: none;
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.2;
+        }
+
+        .image-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .image-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .image-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 400px;
+        }
+
+        .login-form {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 100%;
+            background: white;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .brand-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            transform: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
+        }
+
+        h3 {
+            color: var(--text-color);
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--light-text);
+            font-size: 0.95rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            height: calc(3.5rem + 2px);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-floating > label {
+            padding: 1rem;
+            color: var(--light-text);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 12px;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
+        }
+
+        .alert-danger {
+            background: rgba(239, 35, 60, 0.1);
+            border: none;
+            color: var(--error-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-danger i {
+            font-size: 1.25rem;
+        }
+
+        @media (min-width: 992px) {
+            .login-image {
+                display: block;
+            }
+
+            .form-wrapper {
+                padding: 3rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-wrapper > * {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .form-wrapper > *:nth-child(2) { animation-delay: 0.2s; }
+        .form-wrapper > *:nth-child(3) { animation-delay: 0.4s; }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--light-text);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-image">
+            <div class="image-content">
+                <h2>Academic Affairs Office</h2>
+                <p>Schedule your appointments efficiently with our online booking system.</p>
+            </div>
+        </div>
+        <div class="login-form">
+            <div class="form-wrapper">
+                <div class="brand-section">
+                    <div class="brand-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h3>Welcome Back</h3>
+                    <p class="subtitle">Please sign in to your account</p>
+                </div>
+
+                <!-- Session Status -->
+                @if (session('status'))
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle-fill"></i>
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <!-- Validation Errors -->
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Please check the form and try again.
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <div class="form-floating mb-3">
+                        <input type="email" 
+                               class="form-control @error('email') is-invalid @enderror" 
+                               id="email" 
+                               name="email" 
+                               value="{{ old('email') }}"
+                               placeholder="name@example.com"
+                               required 
+                               autofocus>
+                        <label for="email">{{ __('Email') }}</label>
+                        @error('email')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" 
+                               class="form-control @error('password') is-invalid @enderror" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Password"
+                               required>
+                        <label for="password">{{ __('Password') }}</label>
+                        @error('password')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>{{ __('Log in') }}
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <!-- <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div> -->
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+</body>
+</html>

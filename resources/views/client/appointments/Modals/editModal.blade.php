@@ -5,47 +5,47 @@
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
         <!-- Modal Content -->
-        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-auto z-10">
-            <div class="px-6 py-4 border-b">
-                <h3 class="text-lg font-semibold text-gray-900">Edit Appointment</h3>
-                <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-500">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="relative bg-white rounded-xl shadow-2xl max-w-lg w-full mx-auto z-10 transform transition-all">
+            <div class="px-6 py-4 border-b bg-gray-50 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Edit Appointment</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
-            <form id="editAppointmentForm" method="POST">
+            <form id="editAppointmentForm" method="POST" class="divide-y divide-gray-100">
                 @csrf
                 @method('PUT')
                 
-                <div class="px-6 py-4 space-y-4">
+                <div class="px-6 py-6 space-y-6">
                     <!-- Phone Number -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number (Optional)</label>
+                    <div class="group">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number (Optional)</label>
                         <input type="tel" name="phone_number" id="edit_phone_number" 
-                               class="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                               class="form-input w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
                     </div>
 
                     <!-- Date and Time -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
                             <input type="date" name="date" id="edit_date" required
-                                   class="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                   class="form-input w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Time</label>
                             <input type="time" name="time" id="edit_time" required
-                                   class="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                   class="form-input w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
                         </div>
                     </div>
 
                     <!-- Purpose -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
+                    <div class="group">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Purpose</label>
                         <select name="purpose" id="edit_purpose" required
-                                class="form-select w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                class="form-select w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
                             <option value="">Select Purpose</option>
                             <option value="Academic Advising">Academic Advising</option>
                             <option value="Personal Concerns">Personal Concerns</option>
@@ -57,20 +57,20 @@
                     </div>
 
                     <!-- Description -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <div class="group">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
                         <textarea name="description" id="edit_description" rows="4" required
-                                  class="form-textarea w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
+                                  class="form-textarea w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"></textarea>
                     </div>
                 </div>
 
-                <div class="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
+                <div class="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end space-x-4">
                     <button type="button" onclick="closeEditModal()" 
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
                         Cancel
                     </button>
                     <button type="submit" 
-                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            class="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
                         Update Appointment
                     </button>
                 </div>
