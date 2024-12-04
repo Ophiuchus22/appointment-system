@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAppointmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
     });
 
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+        Route::get('/appointments', [AdminAppointmentController::class, 'index'])
+            ->name('appointments.index');
+        
+        Route::get('/appointments/create', [AdminAppointmentController::class, 'create'])
+            ->name('appointments.create');
+        
+        Route::post('/appointments', [AdminAppointmentController::class, 'store'])
+            ->name('appointments.store');
+        
+        Route::get('/appointments/{appointment}/edit', [AdminAppointmentController::class, 'edit'])
+            ->name('appointments.edit');
+        
+        Route::put('/appointments/{appointment}', [AdminAppointmentController::class, 'update'])
+            ->name('appointments.update');
+        
+        Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])
+            ->name('appointments.destroy');
+    });
+    
     // Add these new routes
     Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])
         ->name('client.appointments.update');

@@ -105,7 +105,7 @@ class DashboardController extends Controller
                 ];
 
                 // Determine the action based on timestamps and status
-                if ($appointment->created_at->eq($appointment->updated_at)) {
+                if ($appointment->created_at == $appointment->updated_at) {
                     $activity['action'] = 'created an appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
                 } else {
                     switch ($appointment->status) {
