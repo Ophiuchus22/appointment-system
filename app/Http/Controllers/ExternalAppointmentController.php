@@ -102,4 +102,100 @@ class ExternalAppointmentController extends Controller
         $appointment = Appointment::with('user')->findOrFail($id);
         return response()->json($appointment);
     }
+
+    public function confirm(Appointment $appointment)
+    {
+        try {
+            if ($appointment->status !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only pending appointments can be confirmed'
+                ], 400);
+            }
+
+            $appointment->update(['status' => 'confirmed']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment has been confirmed successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while confirming the appointment'
+            ], 500);
+        }
+    }
+
+    public function cancel(Appointment $appointment)
+    {
+        try {
+            if (in_array($appointment->status, ['cancelled', 'completed'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This appointment cannot be cancelled'
+                ], 400);
+            }
+
+            $appointment->update(['status' => 'cancelled']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment has been cancelled successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while cancelling the appointment'
+            ], 500);
+        }
+    }
+
+    public function complete(Appointment $appointment)
+    {
+        try {
+            if ($appointment->status !== 'confirmed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only confirmed appointments can be marked as completed'
+                ], 400);
+            }
+
+            $appointment->update(['status' => 'completed']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment has been marked as completed'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while completing the appointment'
+            ], 500);
+        }
+    }
+
+    public function destroy(Appointment $appointment)
+    {
+        try {
+            if (!in_array($appointment->status, ['cancelled', 'completed'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only cancelled or completed appointments can be deleted'
+                ], 400);
+            }
+
+            $appointment->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment has been deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the appointment'
+            ], 500);
+        }
+    }
 } 

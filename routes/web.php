@@ -52,6 +52,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/appointments', [ExternalAppointmentController::class, 'index'])->name('appointments.index');
         Route::post('/appointments/store', [ExternalAppointmentController::class, 'store'])->name('appointments.store');
         Route::get('/appointments/{id}', [ExternalAppointmentController::class, 'show'])->name('admin.appointments.show');
+        Route::patch('/appointments/{appointment}/confirm', [ExternalAppointmentController::class, 'confirm'])->name('appointments.confirm');
+        Route::patch('/appointments/{appointment}/cancel', [ExternalAppointmentController::class, 'cancel'])->name('appointments.cancel');
+        Route::patch('/appointments/{appointment}/complete', [ExternalAppointmentController::class, 'complete'])->name('appointments.complete');
+        Route::delete('/appointments/{appointment}', [ExternalAppointmentController::class, 'destroy'])->name('appointments.destroy');
     });
 });
 
