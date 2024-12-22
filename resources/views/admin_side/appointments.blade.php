@@ -12,6 +12,7 @@
     <!-- Include the modal right at the start of body -->
     @include('admin_side.Modals.add_external_appointment_modal')
     @include('admin_side.Modals.view_appointment_details_modal')
+    @include('admin_side.Modals.confirmation_modal')
 
     <div class="flex">
         @include('layouts.sidebar')
@@ -275,106 +276,199 @@
             }
         });
 
+        // Notification functions
+        function showSuccessNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg shadow-lg transition-all duration-500 z-50';
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        function showErrorNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-lg transition-all duration-500 z-50';
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+
+        // Modal handling function
+        function showConfirmationModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirmationModal');
+            const titleElement = document.getElementById('modal-title');
+            const messageElement = document.getElementById('modal-message');
+            const confirmButton = document.getElementById('confirmButton');
+            const cancelButton = document.getElementById('cancelButton');
+
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            // Show modal
+            modal.classList.remove('hidden');
+
+            // Handle confirm button
+            const handleConfirm = () => {
+                modal.classList.add('hidden');
+                confirmButton.removeEventListener('click', handleConfirm);
+                cancelButton.removeEventListener('click', handleCancel);
+                onConfirm();
+            };
+
+            // Handle cancel button
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                confirmButton.removeEventListener('click', handleConfirm);
+                cancelButton.removeEventListener('click', handleCancel);
+            };
+
+            confirmButton.addEventListener('click', handleConfirm);
+            cancelButton.addEventListener('click', handleCancel);
+        }
+
+        // Updated action functions
         function confirmAppointment(appointmentId) {
-            if (confirm('Are you sure you want to confirm this appointment?')) {
-                fetch(`/admin/appointments/${appointmentId}/confirm`, {
-                    method: 'PATCH',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload the page to show updated status
-                        window.location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while confirming the appointment');
-                });
-            }
+            showConfirmationModal(
+                'Confirm Appointment',
+                'Are you sure you want to confirm this appointment?',
+                () => {
+                    fetch(`/admin/appointments/${appointmentId}/confirm`, {
+                        method: 'PATCH',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessNotification('Appointment confirmed successfully');
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showErrorNotification(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorNotification('An error occurred while confirming the appointment');
+                    });
+                }
+            );
         }
 
         function cancelAppointment(appointmentId) {
-            if (confirm('Are you sure you want to cancel this appointment?')) {
-                fetch(`/admin/appointments/${appointmentId}/cancel`, {
-                    method: 'PATCH',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload the page to show updated status
-                        window.location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while cancelling the appointment');
-                });
-            }
+            showConfirmationModal(
+                'Cancel Appointment',
+                'Are you sure you want to cancel this appointment? This action cannot be undone.',
+                () => {
+                    fetch(`/admin/appointments/${appointmentId}/cancel`, {
+                        method: 'PATCH',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessNotification('Appointment cancelled successfully');
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showErrorNotification(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorNotification('An error occurred while cancelling the appointment');
+                    });
+                }
+            );
         }
 
         function completeAppointment(appointmentId) {
-            if (confirm('Are you sure you want to mark this appointment as completed?')) {
-                fetch(`/admin/appointments/${appointmentId}/complete`, {
-                    method: 'PATCH',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while completing the appointment');
-                });
-            }
+            showConfirmationModal(
+                'Complete Appointment',
+                'Are you sure you want to mark this appointment as completed?',
+                () => {
+                    fetch(`/admin/appointments/${appointmentId}/complete`, {
+                        method: 'PATCH',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessNotification('Appointment marked as completed');
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showErrorNotification(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorNotification('An error occurred while completing the appointment');
+                    });
+                }
+            );
         }
 
         function deleteAppointment(appointmentId) {
-            if (confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
-                fetch(`/admin/appointments/${appointmentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the appointment');
-                });
-            }
+            showConfirmationModal(
+                'Delete Appointment',
+                'Are you sure you want to delete this appointment? This action cannot be undone.',
+                () => {
+                    fetch(`/admin/appointments/${appointmentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessNotification('Appointment deleted successfully');
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showErrorNotification(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorNotification('An error occurred while deleting the appointment');
+                    });
+                }
+            );
         }
     </script>
 </body>

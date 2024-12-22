@@ -101,20 +101,25 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        
-        // Prevent deleting the last admin
-        if ($user->role === 'admin') {
-            $adminCount = User::where('role', 'admin')->count();
-            if ($adminCount <= 1) {
-                return redirect()->route('admin.users.index')
-                    ->with('error', 'Cannot delete the last admin user');
+        try {
+            $user = User::findOrFail($id);
+            
+            // Prevent deleting the last admin
+            if ($user->role === 'admin') {
+                $adminCount = User::where('role', 'admin')->count();
+                if ($adminCount <= 1) {
+                    return redirect()->route('admin.users.index')
+                        ->with('error', 'Cannot delete the last admin user');
+                }
             }
+
+            $user->delete();
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'User deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'An error occurred while deleting the user');
         }
-
-        $user->delete();
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User deleted successfully');
     }
 }
