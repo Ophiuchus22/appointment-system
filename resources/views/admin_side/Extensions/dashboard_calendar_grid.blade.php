@@ -35,7 +35,13 @@
                             {{ $appointment->purpose }}
                         </div>
                         @if($viewType === 'week')
-                            <div class="mt-2 text-sm break-words">{{ $appointment->user->name }}</div>
+                            <div class="mt-2 text-sm break-words">
+                                @if($appointment->appointment_type === 'Internal')
+                                    {{ $appointment->user ? $appointment->user->name : 'Unknown User' }}
+                                @else
+                                    {{ $appointment->first_name }} {{ $appointment->last_name }}
+                                @endif
+                            </div>
                         @else
                             <div class="text-xs opacity-75 capitalize">{{ $appointment->status }}</div>
                         @endif
