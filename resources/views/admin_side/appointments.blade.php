@@ -58,6 +58,61 @@
                     @endif
                 </div>
 
+                <!-- Add this after the header section and before the table -->
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <!-- Status Filter -->
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="status-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <!-- Date Range Filter -->
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                            <select id="date-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">All Dates</option>
+                                <option value="today">Today</option>
+                                <option value="tomorrow">Tomorrow</option>
+                                <option value="this_week">This Week</option>
+                                <option value="next_week">Next Week</option>
+                                <option value="this_month">This Month</option>
+                            </select>
+                        </div>
+
+                        <!-- Appointment Type Filter -->
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select id="type-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">All Types</option>
+                                <option value="Internal">Internal</option>
+                                <option value="External">External</option>
+                            </select>
+                        </div>
+
+                        <!-- Search by Name -->
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                            <input type="text" id="search" placeholder="Search by name..." 
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+
+                        <!-- Clear Filters Button -->
+                        <div class="flex items-end">
+                            <button onclick="clearFilters()" 
+                                class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Table Section -->
                 <div class="relative">
                     <table class="min-w-full">
@@ -469,6 +524,155 @@
                     });
                 }
             );
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all filter elements
+            const statusFilter = document.getElementById('status-filter');
+            const dateFilter = document.getElementById('date-filter');
+            const typeFilter = document.getElementById('type-filter');
+            const searchInput = document.getElementById('search');
+
+            // Add event listeners to all filters
+            [statusFilter, dateFilter, typeFilter].forEach(filter => {
+                filter.addEventListener('change', applyFilters);
+            });
+
+            // Add debounced search
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            });
+        });
+
+        function applyFilters() {
+            const status = document.getElementById('status-filter').value;
+            const dateRange = document.getElementById('date-filter').value;
+            const type = document.getElementById('type-filter').value;
+            const search = document.getElementById('search').value.toLowerCase();
+
+            // Get all rows except header
+            const rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                let showRow = true;
+
+                // Status filter - Updated to properly find and compare status
+                if (status) {
+                    const statusCell = row.querySelector('td:nth-child(6) span'); // Adjust if your status is in a different column
+                    const rowStatus = statusCell ? statusCell.textContent.toLowerCase().trim() : '';
+                    if (rowStatus !== status.toLowerCase()) {
+                        showRow = false;
+                    }
+                }
+
+                // Type filter
+                if (type && row.querySelector('td:nth-child(1)').textContent.trim() !== type) {
+                    showRow = false;
+                }
+
+                // Name search
+                if (search) {
+                    const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    if (!name.includes(search)) {
+                        showRow = false;
+                    }
+                }
+
+                // Date range filter
+                if (dateRange) {
+                    const appointmentDate = new Date(row.querySelector('td:nth-child(3)').textContent);
+                    const today = new Date();
+                    
+                    switch(dateRange) {
+                        case 'today':
+                            showRow = isSameDay(appointmentDate, today);
+                            break;
+                        case 'tomorrow':
+                            const tomorrow = new Date(today);
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            showRow = isSameDay(appointmentDate, tomorrow);
+                            break;
+                        case 'this_week':
+                            showRow = isThisWeek(appointmentDate);
+                            break;
+                        case 'next_week':
+                            showRow = isNextWeek(appointmentDate);
+                            break;
+                        case 'this_month':
+                            showRow = isSameMonth(appointmentDate, today);
+                            break;
+                    }
+                }
+
+                // Show/hide row
+                row.classList.toggle('hidden', !showRow);
+            });
+
+            // Show "No results" message if all rows are hidden
+            const visibleRows = document.querySelectorAll('tbody tr:not(.hidden)').length;
+            const noResultsRow = document.querySelector('tbody tr.no-results');
+            
+            if (visibleRows === 0) {
+                if (!noResultsRow) {
+                    const tbody = document.querySelector('tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.className = 'no-results';
+                    newRow.innerHTML = `
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            No appointments found matching the selected filters
+                        </td>
+                    `;
+                    tbody.appendChild(newRow);
+                }
+            } else if (noResultsRow) {
+                noResultsRow.remove();
+            }
+        }
+
+        function clearFilters() {
+            // Reset all filters
+            document.getElementById('status-filter').value = '';
+            document.getElementById('date-filter').value = '';
+            document.getElementById('type-filter').value = '';
+            document.getElementById('search').value = '';
+
+            // Show all rows
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => row.classList.remove('hidden'));
+
+            // Remove "No results" row if it exists
+            const noResultsRow = document.querySelector('tbody tr.no-results');
+            if (noResultsRow) {
+                noResultsRow.remove();
+            }
+        }
+
+        // Helper functions for date filtering
+        function isSameDay(date1, date2) {
+            return date1.getDate() === date2.getDate() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getFullYear() === date2.getFullYear();
+        }
+
+        function isSameMonth(date1, date2) {
+            return date1.getMonth() === date2.getMonth() &&
+                   date1.getFullYear() === date2.getFullYear();
+        }
+
+        function isThisWeek(date) {
+            const today = new Date();
+            const firstDay = new Date(today.setDate(today.getDate() - today.getDay()));
+            const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+            return date >= firstDay && date <= lastDay;
+        }
+
+        function isNextWeek(date) {
+            const today = new Date();
+            const firstDay = new Date(today.setDate(today.getDate() - today.getDay() + 7));
+            const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 13));
+            return date >= firstDay && date <= lastDay;
         }
     </script>
 </body>
