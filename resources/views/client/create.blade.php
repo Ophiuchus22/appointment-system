@@ -122,7 +122,7 @@
     </div>
 </div>
 
-<div class="container py-6 mx-auto">
+<div class="container py-5 mx-auto">
     <div class="max-w-2xl mx-auto">
         <div class="bg-white rounded-lg shadow p-6">
             <!-- Tab Navigation -->
