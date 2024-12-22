@@ -27,14 +27,20 @@
                     </div>
 
                     <div class="relative">
-                        <label class="text-gray-700 text-sm font-medium mb-1 block">College</label>
-                        <select name="college" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white" required>
-                            <option value="">Select College</option>
+                        <label class="text-gray-700 text-sm font-medium mb-1 block">College/Office</label>
+                        <select name="college_office" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white" required>
+                            <option value="">Select College/Office</option>
                             <option value="COLLEGE OF ARTS AND SCIENCES">College of Arts and Sciences</option>
                             <option value="COLLEGE OF BUSINESS EDUCATION">College of Business Education</option>
                             <option value="COLLEGE OF CRIMINAL JUSTICE">College of Criminal Justice</option>
                             <option value="COLLEGE OF ENGINEERING AND TECHNOLOGY">College of Engineering and Technology</option>
                             <option value="COLLEGE OF TEACHER EDUCATION">College of Teacher Education</option>
+                            <option value="COLLEGE OF ALLIED HEALTH SCIENCES">College of Allied Health Sciences</option>
+                            <option value="FINANCE OFFICE">Finance Office</option>
+                            <option value="CASHIER'S OFFICE">Cashier's Office</option>
+                            <option value="REGISTRAR'S OFFICE">Registrar's Office</option>
+                            <option value="GUIDANCE OFFICE">Guidance Office</option>
+                            <option value="SSC OFFICE">SSC Office</option>
                         </select>
                         <div class="absolute right-3 top-[60%] pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

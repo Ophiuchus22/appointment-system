@@ -83,7 +83,7 @@
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
-                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">College</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">College/Office</th>
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -97,7 +97,7 @@
                                             {{ ucfirst($user->role) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $user->college }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $user->college_office }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <div class="flex items-center space-x-3">
                                             <button 
@@ -164,6 +164,8 @@
         // Modal management functions
     function openAddUserModal() {
         document.getElementById('addUserModal').classList.remove('hidden');
+        // Close dropdown when modal opens
+        document.getElementById('dropdownMenu').classList.add('hidden');
     }
 
     function closeAddUserModal() {
@@ -172,6 +174,8 @@
 
     function openAddAdminModal() {
         document.getElementById('addAdminModal').classList.remove('hidden');
+        // Close dropdown when modal opens
+        document.getElementById('dropdownMenu').classList.add('hidden');
     }
 
     function closeAddAdminModal() {
@@ -199,12 +203,12 @@
                 
                 if (userRole === 'user') {
                     collegeContainer.style.display = 'block';
-                    collegeField.value = user.college;
-                    collegeField.required = true;  // Make college required for users
+                    collegeField.value = user.college_office;
+                    collegeField.required = true;
                 } else {
                     collegeContainer.style.display = 'none';
-                    collegeField.value = '';  // Clear the value for admins
-                    collegeField.required = false;  // Remove required attribute for admins
+                    collegeField.value = '';
+                    collegeField.required = false;
                 }
                 
                 // Show the modal
@@ -278,9 +282,15 @@
     document.addEventListener('click', function (event) {
         const dropdownMenu = document.getElementById('dropdownMenu');
         const dropdownButton = document.getElementById('dropdownButton');
+        const modals = ['addUserModal', 'addAdminModal', 'editUserModal'];
+        
+        // Check if any modal is visible
+        const isAnyModalVisible = modals.some(modalId => 
+            !document.getElementById(modalId).classList.contains('hidden')
+        );
 
-        // Close the dropdown if clicking outside of the dropdown or the button
-        if (!dropdownMenu.contains(event.target) && event.target !== dropdownButton) {
+        // If clicking outside dropdown and button, or if a modal is visible, close the dropdown
+        if ((!dropdownMenu.contains(event.target) && event.target !== dropdownButton) || isAnyModalVisible) {
             dropdownMenu.classList.add('hidden');
         }
     });

@@ -25,9 +25,9 @@ class UserController extends Controller
             'role' => 'required|in:admin,user',
         ];
 
-        // Add college validation only if role is user
+        // Add college_office validation only if role is user
         if ($request->input('role') === 'user') {
-            $rules['college'] = 'required|string|in:COLLEGE OF ARTS AND SCIENCES,COLLEGE OF BUSINESS EDUCATION,COLLEGE OF CRIMINAL JUSTICE,COLLEGE OF ENGINEERING AND TECHNOLOGY,COLLEGE OF TEACHER EDUCATION';
+            $rules['college_office'] = 'required|string|in:COLLEGE OF ARTS AND SCIENCES,COLLEGE OF BUSINESS EDUCATION,COLLEGE OF CRIMINAL JUSTICE,COLLEGE OF ENGINEERING AND TECHNOLOGY,COLLEGE OF TEACHER EDUCATION,COLLEGE OF ALLIED HEALTH SCIENCES,FINANCE OFFICE,CASHIER\'S OFFICE,REGISTRAR\'S OFFICE,GUIDANCE OFFICE,SSC OFFICE';
         }
 
         $validatedData = $request->validate($rules);
@@ -40,9 +40,9 @@ class UserController extends Controller
             'role' => $validatedData['role'],
         ];
 
-        // Only add college if role is user
+        // Only add college_office if role is user
         if ($validatedData['role'] === 'user') {
-            $userData['college'] = $validatedData['college'];
+            $userData['college_office'] = $validatedData['college_office'];
         }
 
         User::create($userData);
@@ -67,9 +67,9 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
         ];
 
-        // Add college validation if role is user
+        // Add college_office validation if role is user
         if ($user->role === 'user') {
-            $rules['college'] = 'required|string|in:COLLEGE OF ARTS AND SCIENCES,COLLEGE OF BUSINESS EDUCATION,COLLEGE OF CRIMINAL JUSTICE,COLLEGE OF ENGINEERING AND TECHNOLOGY,COLLEGE OF TEACHER EDUCATION';
+            $rules['college_office'] = 'required|string|in:COLLEGE OF ARTS AND SCIENCES,COLLEGE OF BUSINESS EDUCATION,COLLEGE OF CRIMINAL JUSTICE,COLLEGE OF ENGINEERING AND TECHNOLOGY,COLLEGE OF TEACHER EDUCATION,COLLEGE OF ALLIED HEALTH SCIENCES,FINANCE OFFICE,CASHIER\'S OFFICE,REGISTRAR\'S OFFICE,GUIDANCE OFFICE,SSC OFFICE';
         }
 
         // Add password validation if password is being changed
@@ -83,9 +83,9 @@ class UserController extends Controller
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
 
-        // Update college if user is not admin
+        // Update college_office if user is not admin
         if ($user->role === 'user') {
-            $user->college = $validatedData['college'];
+            $user->college_office = $validatedData['college_office'];
         }
 
         // Update password if provided
