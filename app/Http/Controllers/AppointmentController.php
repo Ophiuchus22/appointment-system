@@ -12,7 +12,7 @@ class AppointmentController extends Controller
 {
     public function create()
     {
-        return view('client.appointments.create');
+        return view('client.create');
     }
 
     public function viewAppointment()
@@ -21,7 +21,7 @@ class AppointmentController extends Controller
                                 ->orderBy('date', 'desc')
                                 ->orderBy('time', 'desc')
                                 ->get();
-        return view('client.appointments.viewAppointment', compact('appointments'));
+        return view('client.viewAppointment', compact('appointments'));
     }
 
     public function store(Request $request)

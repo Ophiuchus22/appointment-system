@@ -227,6 +227,6 @@
         });
     </script>
 
-    @include('client.appointments.Modals.editModal')
+    @include('client.Modals.editModal')
 </body>
 </html>

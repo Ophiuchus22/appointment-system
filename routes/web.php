@@ -36,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', [AppointmentController::class, 'create'])->name('create');
         Route::post('/', [AppointmentController::class, 'store'])->name('store');
         Route::get('/', [AppointmentController::class, 'viewAppointment'])->name('viewAppointment');
+        Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
+        Route::patch('/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
+        Route::delete('/{appointment}', [AppointmentController::class, 'destroy'])->name('destroy');
     });
 
     // Add these routes inside the authenticated middleware group
@@ -46,16 +49,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
     });
-
-    // Add these new routes
-    Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])
-        ->name('client.appointments.update');
-    
-    Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
-        ->name('client.appointments.cancel');
-    
-    Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])
-        ->name('client.appointments.destroy');
 });
 
 require __DIR__.'/auth.php';
