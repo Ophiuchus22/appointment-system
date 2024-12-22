@@ -188,7 +188,6 @@ class ExternalAppointmentController extends Controller
                 'description' => 'required|string|max:1000',
             ]);
 
-            // Check for existing appointments
             $existingAppointment = Appointment::where('id', '!=', $appointment->id)
                 ->where('date', $validated['date'])
                 ->where('time', $validated['time'])
@@ -199,9 +198,7 @@ class ExternalAppointmentController extends Controller
             }
 
             $appointment->update($validated);
-
-            return redirect()->route('admin.appointments.index')
-                ->with('success', 'Appointment updated successfully');
+            return redirect('/admin/appointments')->with('success', 'Appointment updated successfully');
 
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while updating the appointment: ' . $e->getMessage());

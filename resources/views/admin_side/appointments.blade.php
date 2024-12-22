@@ -626,27 +626,7 @@
             e.preventDefault();
             
             const form = e.target;
-            const formData = new FormData(form);
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                // Simply reload the page - the session flash message will be shown
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                window.location.reload();
-            });
+            form.submit(); // Just submit the form normally
         });
     </script>
 </body>
