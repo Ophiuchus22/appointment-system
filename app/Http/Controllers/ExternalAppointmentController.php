@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Mail\AppointmentUpdated;
+use App\Mail\AppointmentConfirmed;
+use App\Mail\AppointmentCancelled;
+use Illuminate\Support\Facades\Mail;
 
 class ExternalAppointmentController extends Controller
 {
@@ -111,6 +115,14 @@ class ExternalAppointmentController extends Controller
             }
 
             $appointment->update(['status' => 'confirmed']);
+
+            // Send confirmation email
+            $email = $appointment->appointment_type === 'Internal' 
+                ? $appointment->user->email 
+                : $appointment->email;
+
+            Mail::to($email)->send(new AppointmentConfirmed($appointment));
+
             return back()->with('success', 'Appointment has been confirmed successfully');
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while confirming the appointment');
@@ -125,6 +137,14 @@ class ExternalAppointmentController extends Controller
             }
 
             $appointment->update(['status' => 'cancelled']);
+
+            // Send cancellation email
+            $email = $appointment->appointment_type === 'Internal' 
+                ? $appointment->user->email 
+                : $appointment->email;
+
+            Mail::to($email)->send(new AppointmentCancelled($appointment));
+
             return back()->with('success', 'Appointment has been cancelled successfully');
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while cancelling the appointment');
@@ -197,7 +217,32 @@ class ExternalAppointmentController extends Controller
                 return back()->with('error', 'This time slot is already booked. Please select a different time.');
             }
 
+            // Store old values
+            $oldValues = [
+                'date' => $appointment->date,
+                'time' => $appointment->time
+            ];
+
             $appointment->update($validated);
+
+            // Check if date or time changed
+            if ($oldValues['date'] != $validated['date'] || $oldValues['time'] != $validated['time']) {
+                $changes = [
+                    'old' => $oldValues,
+                    'new' => [
+                        'date' => $validated['date'],
+                        'time' => $validated['time']
+                    ]
+                ];
+
+                // Send email
+                $email = $appointment->appointment_type === 'Internal' 
+                    ? $appointment->user->email 
+                    : $appointment->email;
+
+                Mail::to($email)->send(new AppointmentUpdated($appointment, $changes));
+            }
+
             return redirect('/admin/appointments')->with('success', 'Appointment updated successfully');
 
         } catch (\Exception $e) {
