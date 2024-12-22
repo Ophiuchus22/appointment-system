@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::get('/appointments', [ExternalAppointmentController::class, 'index'])->name('appointments.index');
         Route::post('/appointments/store', [ExternalAppointmentController::class, 'store'])->name('appointments.store');
+        Route::get('/appointments/{id}', [ExternalAppointmentController::class, 'show'])->name('admin.appointments.show');
     });
 });
 

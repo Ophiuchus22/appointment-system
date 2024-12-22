@@ -96,4 +96,10 @@ class ExternalAppointmentController extends Controller
                 ->withInput();
         }
     }
+
+    public function show($id)
+    {
+        $appointment = Appointment::with('user')->findOrFail($id);
+        return response()->json($appointment);
+    }
 } 
