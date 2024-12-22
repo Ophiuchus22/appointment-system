@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Carbon\Carbon;
 
-class AppointmentController extends Controller
+class InternalAppointmentController extends Controller
 {
     public function create()
     {

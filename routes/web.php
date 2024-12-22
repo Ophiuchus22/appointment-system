@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\InternalAppointmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
@@ -33,12 +33,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Appointment routes
     Route::prefix('appointments')->name('client.appointments.')->group(function () {
-        Route::get('/create', [AppointmentController::class, 'create'])->name('create');
-        Route::post('/', [AppointmentController::class, 'store'])->name('store');
-        Route::get('/', [AppointmentController::class, 'viewAppointment'])->name('viewAppointment');
-        Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
-        Route::patch('/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('cancel');
-        Route::delete('/{appointment}', [AppointmentController::class, 'destroy'])->name('destroy');
+        Route::get('/create', [InternalAppointmentController::class, 'create'])->name('create');
+        Route::post('/', [InternalAppointmentController::class, 'store'])->name('store');
+        Route::get('/', [InternalAppointmentController::class, 'viewAppointment'])->name('viewAppointment');
+        Route::put('/{appointment}', [InternalAppointmentController::class, 'update'])->name('update');
+        Route::patch('/{appointment}/cancel', [InternalAppointmentController::class, 'cancel'])->name('cancel');
+        Route::delete('/{appointment}', [InternalAppointmentController::class, 'destroy'])->name('destroy');
     });
 
     // Add these routes inside the authenticated middleware group
