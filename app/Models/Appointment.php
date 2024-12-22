@@ -12,13 +12,14 @@ class Appointment extends Model
         'first_name',
         'last_name',
         'email',
-        'company_name',
-        'appointment_type',
         'phone_number',
+        'company_name',
+        'address',
         'date',
         'time',
         'purpose',
         'description',
+        'appointment_type',
         'status'
     ];
 

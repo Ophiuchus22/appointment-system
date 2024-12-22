@@ -5,6 +5,7 @@ use App\Http\Controllers\InternalAppointmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExternalAppointmentController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/appointments', [ExternalAppointmentController::class, 'index'])->name('appointments.index');
+        Route::post('/appointments/store', [ExternalAppointmentController::class, 'store'])->name('appointments.store');
     });
 });
 

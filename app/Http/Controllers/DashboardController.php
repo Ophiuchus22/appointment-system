@@ -98,7 +98,10 @@ class DashboardController extends Controller
             ->map(function ($appointment) {
                 $activity = [
                     'type' => 'appointment',
-                    'user' => $appointment->user->name,
+                    // Use first_name and last_name for external appointments, user name for internal
+                    'user' => $appointment->appointment_type === 'External' 
+                        ? $appointment->first_name . ' ' . $appointment->last_name
+                        : ($appointment->user ? $appointment->user->name : 'Unknown User'),
                     'time' => Carbon::parse(
                         max($appointment->created_at, $appointment->updated_at)
                     )->diffForHumans()
