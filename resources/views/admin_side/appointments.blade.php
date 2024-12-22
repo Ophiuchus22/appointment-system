@@ -58,13 +58,13 @@
                     @endif
                 </div>
 
-                <!-- Add this after the header section and before the table -->
-                <div class="p-4 border-b border-gray-100">
-                    <div class="flex flex-wrap gap-4 items-center">
+                <!-- Enhanced filter section -->
+                <div class="p-6 border-b border-gray-100 bg-white">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
                         <!-- Status Filter -->
-                        <div class="flex-1 min-w-[200px]">
-                            <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select id="status-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <div class="space-y-1.5">
+                            <label for="status-filter" class="block text-sm font-medium text-gray-700">Status</label>
+                            <select id="status-filter" class="w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-3 pr-10 py-2.5 text-sm transition duration-150 ease-in-out">
                                 <option value="">All Status</option>
                                 <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
@@ -74,9 +74,9 @@
                         </div>
 
                         <!-- Date Range Filter -->
-                        <div class="flex-1 min-w-[200px]">
-                            <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                            <select id="date-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <div class="space-y-1.5">
+                            <label for="date-filter" class="block text-sm font-medium text-gray-700">Date Range</label>
+                            <select id="date-filter" class="w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-3 pr-10 py-2.5 text-sm transition duration-150 ease-in-out">
                                 <option value="">All Dates</option>
                                 <option value="today">Today</option>
                                 <option value="tomorrow">Tomorrow</option>
@@ -87,9 +87,9 @@
                         </div>
 
                         <!-- Appointment Type Filter -->
-                        <div class="flex-1 min-w-[200px]">
-                            <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                            <select id="type-filter" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <div class="space-y-1.5">
+                            <label for="type-filter" class="block text-sm font-medium text-gray-700">Type</label>
+                            <select id="type-filter" class="w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-3 pr-10 py-2.5 text-sm transition duration-150 ease-in-out">
                                 <option value="">All Types</option>
                                 <option value="Internal">Internal</option>
                                 <option value="External">External</option>
@@ -97,16 +97,26 @@
                         </div>
 
                         <!-- Search by Name -->
-                        <div class="flex-1 min-w-[200px]">
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                            <input type="text" id="search" placeholder="Search by name..." 
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <div class="space-y-1.5">
+                            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                            <div class="relative">
+                                <input type="text" id="search" placeholder="Search by name..." 
+                                    class="w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-10 pr-4 py-2.5 text-sm transition duration-150 ease-in-out">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Clear Filters Button -->
-                        <div class="flex items-end">
+                        <!-- Clear Filters Button - Adjusted positioning -->
+                        <div class="flex justify-center ml-[-2rem]">
                             <button onclick="clearFilters()" 
-                                class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200">
+                                class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
                                 Clear Filters
                             </button>
                         </div>

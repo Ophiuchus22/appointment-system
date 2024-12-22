@@ -223,32 +223,4 @@ class InternalAppointmentController extends Controller
                 ->with('error', 'Unable to cancel appointment. Please try again later.');
         }
     }
-
-    public function destroy(Appointment $appointment)
-    {
-        try {
-            // Check if user owns this appointment
-            if ($appointment->user_id !== Auth::id()) {
-                return redirect()->route('client.appointments.viewAppointment')
-                    ->with('error', 'Unauthorized access.');
-            }
-
-            // Check if appointment can be deleted (only cancelled or rejected appointments)
-            if (!in_array($appointment->status, ['cancelled', 'rejected'])) {
-                return redirect()->route('client.appointments.viewAppointment')
-                    ->with('error', 'Only cancelled or rejected appointments can be deleted.');
-            }
-
-            // Delete the appointment
-            $appointment->delete();
-
-            return redirect()->route('client.appointments.viewAppointment')
-                ->with('success', 'Appointment deleted successfully.');
-
-        } catch (Exception $e) {
-            logger()->error('Appointment deletion failed: ' . $e->getMessage());
-            return redirect()->route('client.appointments.viewAppointment')
-                ->with('error', 'Unable to delete appointment. Please try again later.');
-        }
-    }
 }

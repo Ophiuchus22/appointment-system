@@ -102,17 +102,17 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Purpose</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($appointments as $appointment)
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50 transition-colors duration-200">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">
                                             {{ \Carbon\Carbon::parse($appointment->date)->format('M d, Y') }}
@@ -129,54 +129,52 @@
                                             {{ $appointment->description }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            @if($appointment->status === 'pending')
-                                                bg-yellow-100 text-yellow-800
-                                            @elseif($appointment->status === 'approved')
-                                                bg-green-100 text-green-800
-                                            @elseif($appointment->status === 'rejected')
-                                                bg-red-100 text-red-800
-                                            @elseif($appointment->status === 'completed')
-                                                bg-blue-100 text-blue-800
-                                            @endif
-                                        ">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2.5 py-1 text-xs font-medium rounded-full 
+                                            @switch($appointment->status)
+                                                @case('pending')
+                                                    bg-yellow-100 text-yellow-700
+                                                    @break
+                                                @case('approved')
+                                                    bg-green-100 text-green-700
+                                                    @break
+                                                @case('completed')
+                                                    bg-blue-100 text-blue-700
+                                                    @break
+                                                @case('cancelled')
+                                                    bg-red-100 text-red-700
+                                                    @break
+                                                @default
+                                                    bg-gray-100 text-gray-700
+                                            @endswitch">
                                             {{ ucfirst($appointment->status ?? 'Pending') }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $appointment->phone_number ?? 'Not provided' }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex space-x-2">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center space-x-3">
                                             @if($appointment->status === 'pending')
                                                 <button type="button"
                                                         onclick='openEditModal(@json($appointment))'
-                                                        class="text-blue-600 hover:text-blue-800 font-medium">
+                                                        class="inline-flex items-center text-blue-600 hover:text-blue-900">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
                                                     Edit
                                                 </button>
                                             @endif
                                             
                                             @if(in_array($appointment->status, ['pending', 'approved']))
-                                                <form action="{{ route('client.appointments.cancel', $appointment) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="text-yellow-600 hover:text-yellow-800" 
-                                                            onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                        Cancel
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            
-                                            @if(in_array($appointment->status, ['cancelled', 'rejected']))
-                                                <form action="{{ route('client.appointments.destroy', $appointment) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-800"
-                                                            onclick="return confirm('Are you sure you want to delete this appointment? This action cannot be undone.')">
-                                                        Delete
-                                                    </button>
-                                                </form>
+                                                <button type="button" 
+                                                        onclick="confirmCancellation({{ $appointment->id }})"
+                                                        class="inline-flex items-center text-red-600 hover:text-red-900">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                    </svg>
+                                                    Cancel
+                                                </button>
                                             @endif
                                         </div>
                                     </td>
@@ -225,8 +223,91 @@
                 }
             });
         });
+
+        // Add this function to handle the modal
+        function showConfirmationModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirmationModal');
+            const titleElement = document.getElementById('modal-title');
+            const messageElement = document.getElementById('modal-message');
+            const confirmButton = document.getElementById('confirmButton');
+            const cancelButton = document.getElementById('cancelButton');
+
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            // Show modal
+            modal.classList.remove('hidden');
+
+            // Handle confirm button
+            const handleConfirm = () => {
+                modal.classList.add('hidden');
+                confirmButton.removeEventListener('click', handleConfirm);
+                cancelButton.removeEventListener('click', handleCancel);
+                onConfirm();
+            };
+
+            // Handle cancel button
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                confirmButton.removeEventListener('click', handleConfirm);
+                cancelButton.removeEventListener('click', handleCancel);
+            };
+
+            confirmButton.addEventListener('click', handleConfirm);
+            cancelButton.addEventListener('click', handleCancel);
+        }
+
+        function confirmCancellation(appointmentId) {
+            showConfirmationModal(
+                'Cancel Appointment',
+                'Are you sure you want to cancel this appointment? This action cannot be undone.',
+                () => {
+                    // Create and submit form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/appointments/${appointmentId}/cancel`;
+                    
+                    // Add CSRF token
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfToken);
+                    
+                    // Add method field
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'PATCH';
+                    form.appendChild(methodField);
+                    
+                    // Submit the form
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            );
+        }
+
+        // Add click outside to close modal
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('confirmationModal');
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+
+        // Add escape key to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('confirmationModal');
+                if (!modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                }
+            }
+        });
     </script>
 
     @include('client.Modals.editModal')
+    @include('client.Modals.confirmation_modal')
 </body>
 </html>
