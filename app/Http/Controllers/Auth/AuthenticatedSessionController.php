@@ -14,8 +14,12 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
+        if (Auth::check()) {
+            return redirect($this->getRedirectPath());
+        }
+
         return view('auth.login');
     }
 
@@ -25,14 +29,19 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        if (Auth::user()->role === 'admin') {
-            return redirect('/admin/dashboard');
-        }
+        return redirect($this->getRedirectPath());
+    }
 
-        return redirect('/appointments/create');
+    /**
+     * Get the redirect path based on user role
+     */
+    private function getRedirectPath(): string
+    {
+        return Auth::user()->role === 'admin' 
+            ? '/admin/dashboard'
+            : '/appointments/create';
     }
 
     /**

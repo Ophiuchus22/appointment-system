@@ -7,6 +7,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect('/dashboard'); // This will then redirect to the appropriate dashboard based on role
+    }
     return view('auth.login');
 });
 
