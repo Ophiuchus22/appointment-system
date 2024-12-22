@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Appointments Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -13,6 +14,7 @@
     @include('admin_side.Modals.add_external_appointment_modal')
     @include('admin_side.Modals.view_appointment_details_modal')
     @include('admin_side.Modals.confirmation_modal')
+    @include('admin_side.Modals.updateModal')
 
     <div class="flex">
         @include('layouts.sidebar')
@@ -202,12 +204,14 @@
                                                     View Details
                                                 </button>
 
-                                                <!-- Edit -->
-                                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                                                <!-- Update -->
+                                                <button type="button"
+                                                        onclick='openUpdateModal(@json($appointment))' 
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
                                                     <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                     </svg>
-                                                    Edit
+                                                    Update
                                                 </button>
 
                                                 @if($appointment->status === 'pending')
@@ -267,13 +271,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .fade-out {
-            opacity: 0;
-            transition: opacity 0.5s ease-out;
-        }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -342,47 +339,6 @@
         });
 
         // Notification functions
-        function showSuccessNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg shadow-lg transition-all duration-500 z-50';
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 500);
-            }, 3000);
-        }
-
-        function showErrorNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-lg transition-all duration-500 z-50';
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 500);
-            }, 5000);
-        }
-
-        // Modal handling function
         function showConfirmationModal(title, message, onConfirm) {
             const modal = document.getElementById('confirmationModal');
             const titleElement = document.getElementById('modal-title');
@@ -431,16 +387,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
-                            showSuccessNotification('Appointment confirmed successfully');
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            showErrorNotification(data.message);
-                        }
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showErrorNotification('An error occurred while confirming the appointment');
+                        window.location.reload();
                     });
                 }
             );
@@ -461,16 +412,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
-                            showSuccessNotification('Appointment cancelled successfully');
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            showErrorNotification(data.message);
-                        }
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showErrorNotification('An error occurred while cancelling the appointment');
+                        window.location.reload();
                     });
                 }
             );
@@ -491,16 +437,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
-                            showSuccessNotification('Appointment marked as completed');
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            showErrorNotification(data.message);
-                        }
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showErrorNotification('An error occurred while completing the appointment');
+                        window.location.reload();
                     });
                 }
             );
@@ -521,16 +462,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
-                            showSuccessNotification('Appointment deleted successfully');
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            showErrorNotification(data.message);
-                        }
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showErrorNotification('An error occurred while deleting the appointment');
+                        window.location.reload();
                     });
                 }
             );
@@ -684,6 +620,34 @@
             const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 13));
             return date >= firstDay && date <= lastDay;
         }
+
+        // Form submission handler
+        document.getElementById('updateAppointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Simply reload the page - the session flash message will be shown
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.reload();
+            });
+        });
     </script>
 </body>
 </html> 

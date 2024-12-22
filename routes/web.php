@@ -56,6 +56,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/appointments/{appointment}/cancel', [ExternalAppointmentController::class, 'cancel'])->name('appointments.cancel');
         Route::patch('/appointments/{appointment}/complete', [ExternalAppointmentController::class, 'complete'])->name('appointments.complete');
         Route::delete('/appointments/{appointment}', [ExternalAppointmentController::class, 'destroy'])->name('appointments.destroy');
+        Route::put('/appointments/{appointment}/update', [ExternalAppointmentController::class, 'update'])
+            ->name('appointments.update');
     });
 });
 
