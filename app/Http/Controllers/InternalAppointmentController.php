@@ -78,6 +78,7 @@ class InternalAppointmentController extends Controller
             $appointment->time = $validated['time'];
             $appointment->purpose = $validated['purpose'];
             $appointment->description = $validated['description'];
+            $appointment->appointment_type = 'Internal';
             $appointment->save();
 
             return redirect()->route('client.appointments.create')
@@ -170,7 +171,8 @@ class InternalAppointmentController extends Controller
                 'date' => $validated['date'],
                 'time' => $time,
                 'purpose' => $validated['purpose'],
-                'description' => $validated['description']
+                'description' => $validated['description'],
+                'appointment_type' => 'Internal'
             ]);
 
             return response()->json([

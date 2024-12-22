@@ -9,6 +9,11 @@ class Appointment extends Model
 {
     protected $fillable = [
         'user_id',
+        'first_name',
+        'last_name',
+        'email',
+        'company_name',
+        'appointment_type',
         'phone_number',
         'date',
         'time',
@@ -20,6 +25,10 @@ class Appointment extends Model
     protected $casts = [
         'date' => 'date',
         'time' => 'datetime',
+    ];
+
+    protected $attributes = [
+        'appointment_type' => 'Internal' // Default value
     ];
 
     // Add these accessors for proper JSON serialization
