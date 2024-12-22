@@ -223,24 +223,37 @@ class ExternalAppointmentController extends Controller
                 'time' => $appointment->time
             ];
 
+            // Update appointment
             $appointment->update($validated);
 
-            // Check if date or time changed
-            if ($oldValues['date'] != $validated['date'] || $oldValues['time'] != $validated['time']) {
-                $changes = [
+            // Create changes array only if date or time changed
+            $changes = [];
+            if ($oldValues['date'] != $validated['date']) {
+                $changes['date'] = [
+                    'old' => $oldValues['date'],
+                    'new' => $validated['date']
+                ];
+            }
+            if ($oldValues['time'] != $validated['time']) {
+                $changes['time'] = [
+                    'old' => $oldValues['time'],
+                    'new' => $validated['time']
+                ];
+            }
+
+            // Only send email if there are changes
+            if (!empty($changes)) {
+                $email = $appointment->appointment_type === 'Internal' 
+                    ? $appointment->user->email 
+                    : $appointment->email;
+
+                Mail::to($email)->send(new AppointmentUpdated($appointment, [
                     'old' => $oldValues,
                     'new' => [
                         'date' => $validated['date'],
                         'time' => $validated['time']
                     ]
-                ];
-
-                // Send email
-                $email = $appointment->appointment_type === 'Internal' 
-                    ? $appointment->user->email 
-                    : $appointment->email;
-
-                Mail::to($email)->send(new AppointmentUpdated($appointment, $changes));
+                ]));
             }
 
             return redirect('/admin/appointments')->with('success', 'Appointment updated successfully');

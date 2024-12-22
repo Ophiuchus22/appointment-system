@@ -7,19 +7,20 @@ This is to inform you that your appointment has been confirmed.
 
 **APPOINTMENT DETAILS:**
 
-Date: {{ $appointment->date->format('M d, Y') }}
-Time: {{ $appointment->time->format('h:i A') }}
-Purpose: {{ $appointment->purpose }}
+Date: {{ $appointment->date->format('M d, Y') }} <br>
+Time: {{ $appointment->time->format('h:i A') }} <br>
+Purpose: {{ $appointment->purpose }} <br>
 Description: {{ $appointment->description }}
 
 Please be reminded to arrive at least 15 minutes before your scheduled appointment.
 
 For inquiries, you may contact us through:
-Email: academic.affairs@example.com
+
+Email: academic.affairs@example.com <br>
 Contact No.: (123) 456-7890
 
 Best regards,
 
-Academic Affairs OFFICE
-Ramon Magsaysay Memorial Colleges - GSC
+Academic Affairs Office -
+Ramon Magsaysay Memorial Colleges
 @endcomponent 
