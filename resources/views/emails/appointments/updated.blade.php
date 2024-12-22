@@ -1,26 +1,30 @@
 @component('mail::message')
-# Appointment Update Notification
+# OFFICE OF THE ACADEMIC AFFAIRS
 
 Dear {{ $appointment->appointment_type === 'Internal' ? $appointment->user->name : $appointment->first_name }},
 
-Your appointment has been updated. Here are the changes:
+This is to inform you that your appointment has been updated.
+
+**CHANGES MADE:**
 
 @if(isset($changes['date']))
-- Date: {{ \Carbon\Carbon::parse($changes['old']['date'])->format('M d, Y') }} → {{ \Carbon\Carbon::parse($changes['new']['date'])->format('M d, Y') }}
+Date: {{ \Carbon\Carbon::parse($changes['old']['date'])->format('M d, Y') }} → {{ \Carbon\Carbon::parse($changes['new']['date'])->format('M d, Y') }}
 @endif
-
 @if(isset($changes['time']))
-- Time: {{ \Carbon\Carbon::parse($changes['old']['time'])->format('h:i A') }} → {{ \Carbon\Carbon::parse($changes['new']['time'])->format('h:i A') }}
+Time: {{ \Carbon\Carbon::parse($changes['old']['time'])->format('h:i A') }} → {{ \Carbon\Carbon::parse($changes['new']['time'])->format('h:i A') }}
 @endif
 
-**Updated Appointment Details:**
-- Purpose: {{ $appointment->purpose }}
-- Description: {{ $appointment->description }}
+**UPDATED APPOINTMENT DETAILS:**
 
-@component('mail::button', ['url' => config('app.url')])
-View Appointment
-@endcomponent
+Purpose: {{ $appointment->purpose }}
+Description: {{ $appointment->description }}
 
-Thanks,<br>
-{{ config('app.name') }}
+For inquiries, you may contact us through:
+Email: academic.affairs@example.com
+Contact No.: (123) 456-7890
+
+Best regards,
+
+Academic Affairs Office
+Ramon Magsaysay Memorial Colleges - GSC
 @endcomponent 

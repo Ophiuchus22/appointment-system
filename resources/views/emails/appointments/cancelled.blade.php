@@ -1,17 +1,22 @@
 @component('mail::message')
-# Appointment Cancellation Notice
+# OFFICE OF THE ACADEMIC AFFAIRS
 
 Dear {{ $appointment->appointment_type === 'Internal' ? $appointment->user->name : $appointment->first_name }},
 
-Your appointment has been cancelled. Here are the details of the cancelled appointment:
+This is to inform you that your appointment has been cancelled.
 
-**Appointment Details:**
-- Date: {{ $appointment->date->format('M d, Y') }}
-- Time: {{ $appointment->time->format('h:i A') }}
-- Purpose: {{ $appointment->purpose }}
+**APPOINTMENT DETAILS:**
 
-If you have any questions, please contact us.
+Date: {{ $appointment->date->format('M d, Y') }}
+Time: {{ $appointment->time->format('h:i A') }}
+Purpose: {{ $appointment->purpose }}
 
-Thanks,<br>
-{{ config('app.name') }}
+For inquiries, you may contact us through:
+Email: academic.affairs@example.com
+Contact No.: (123) 456-7890
+
+Best regards,
+
+Academic Affairs Office
+Ramon Magsaysay Memorial Colleges - GSC
 @endcomponent 

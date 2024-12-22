@@ -1,20 +1,25 @@
 @component('mail::message')
-# Appointment Confirmation
+# OFFICE OF THE ACADEMIC AFFAIRS
 
 Dear {{ $appointment->appointment_type === 'Internal' ? $appointment->user->name : $appointment->first_name }},
 
-Your appointment has been confirmed. Here are the details:
+This is to inform you that your appointment has been confirmed.
 
-**Appointment Details:**
-- Date: {{ $appointment->date->format('M d, Y') }}
-- Time: {{ $appointment->time->format('h:i A') }}
-- Purpose: {{ $appointment->purpose }}
-- Description: {{ $appointment->description }}
+**APPOINTMENT DETAILS:**
 
-@component('mail::button', ['url' => config('app.url')])
-View Appointment
-@endcomponent
+Date: {{ $appointment->date->format('M d, Y') }}
+Time: {{ $appointment->time->format('h:i A') }}
+Purpose: {{ $appointment->purpose }}
+Description: {{ $appointment->description }}
 
-Thanks,<br>
-{{ config('app.name') }}
+Please be reminded to arrive at least 15 minutes before your scheduled appointment.
+
+For inquiries, you may contact us through:
+Email: academic.affairs@example.com
+Contact No.: (123) 456-7890
+
+Best regards,
+
+Academic Affairs OFFICE
+Ramon Magsaysay Memorial Colleges - GSC
 @endcomponent 
