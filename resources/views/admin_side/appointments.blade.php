@@ -10,6 +10,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </head>
 <body class="bg-gray-100">
+    <!-- Add this right after your body tag starts -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-5 rounded-lg flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-3"></div>
+            <p class="text-gray-700">Processing your request...</p>
+        </div>
+    </div>
+
     <!-- Include the modal right at the start of body -->
     @include('admin_side.Modals.add_external_appointment_modal')
     @include('admin_side.Modals.view_appointment_details_modal')
@@ -377,6 +385,7 @@
                 'Confirm Appointment',
                 'Are you sure you want to confirm this appointment?',
                 () => {
+                    showLoading(); // Show loading before the request
                     fetch(`/admin/appointments/${appointmentId}/confirm`, {
                         method: 'PATCH',
                         headers: {
@@ -387,9 +396,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        hideLoading(); // Hide loading after success
                         window.location.reload();
                     })
                     .catch(error => {
+                        hideLoading(); // Hide loading on error
                         console.error('Error:', error);
                         window.location.reload();
                     });
@@ -402,6 +413,7 @@
                 'Cancel Appointment',
                 'Are you sure you want to cancel this appointment? This action cannot be undone.',
                 () => {
+                    showLoading(); // Show loading before the request
                     fetch(`/admin/appointments/${appointmentId}/cancel`, {
                         method: 'PATCH',
                         headers: {
@@ -412,9 +424,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        hideLoading(); // Hide loading after success
                         window.location.reload();
                     })
                     .catch(error => {
+                        hideLoading(); // Hide loading on error
                         console.error('Error:', error);
                         window.location.reload();
                     });
@@ -625,9 +639,25 @@
         document.getElementById('updateAppointmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // First close the modal
+            closeModal('updateModal');
+            
+            // Then show loading overlay
+            showLoading();
+            
+            // Finally submit the form
             const form = e.target;
-            form.submit(); // Just submit the form normally
+            form.submit();
         });
+
+        // Add these utility functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
     </script>
 </body>
 </html> 
