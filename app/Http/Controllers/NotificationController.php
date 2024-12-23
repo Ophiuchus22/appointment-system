@@ -34,4 +34,20 @@ class NotificationController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function deleteAll()
+    {
+        try {
+            Notification::truncate();
+            return response()->json([
+                'success' => true,
+                'message' => 'All notifications deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete notifications'
+            ], 500);
+        }
+    }
 }

@@ -90,11 +90,19 @@
                     <!-- Panel Header -->
                     <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
                         <h2 class="text-lg font-semibold text-gray-800">Notifications</h2>
-                        <button id="closeNotifications" class="text-gray-500 hover:text-gray-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button id="deleteAllNotifications" class="text-red-500 hover:text-red-700 text-sm flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Delete All
+                            </button>
+                            <!-- <button id="closeNotifications" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button> -->
+                        </div>
                     </div>
 
                     <!-- Panel Content -->
@@ -460,6 +468,48 @@
                     day: 'numeric'
                 });
             }
+        }
+
+        // Add delete all notifications functionality
+        const deleteAllBtn = document.getElementById('deleteAllNotifications');
+        if (deleteAllBtn) {
+            deleteAllBtn.addEventListener('click', function() {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                fetch('/notifications/delete-all', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    return response.json().then(data => {
+                        if (!response.ok) {
+                            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                        }
+                        return data;
+                    });
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Refresh notifications
+                        fetchNotifications();
+                        
+                        // Update badge count to 0
+                        const notificationBadge = document.querySelector('#notificationButton .rounded-full');
+                        if (notificationBadge) {
+                            notificationBadge.textContent = '0';
+                            notificationBadge.classList.add('hidden');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error details:', error);
+                });
+            });
         }
     </script>
 </body>
