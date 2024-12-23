@@ -88,10 +88,12 @@
                             <div>
                                 <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Time</label>
                                 <div class="relative">
-                                    <select name="time" id="time" required
-                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="">Select time</option>
-                                        <optgroup label="Morning (9 AM - 12 PM)">
+                                    <select name="time" 
+                                            id="time"
+                                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white appearance-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-500" 
+                                            required>
+                                        <option value="">Select available time</option>
+                                        <optgroup label="Morning (9 AM - 12 PM)" class="text-gray-900 font-medium">
                                             <option value="09:00">9:00 AM</option>
                                             <option value="09:30">9:30 AM</option>
                                             <option value="10:00">10:00 AM</option>
@@ -100,7 +102,7 @@
                                             <option value="11:30">11:30 AM</option>
                                             <option value="12:00">12:00 PM</option>
                                         </optgroup>
-                                        <optgroup label="Afternoon (1 PM - 5 PM)">
+                                        <optgroup label="Afternoon (1 PM - 5 PM)" class="text-gray-900 font-medium">
                                             <option value="13:00">1:00 PM</option>
                                             <option value="13:30">1:30 PM</option>
                                             <option value="14:00">2:00 PM</option>
@@ -112,6 +114,19 @@
                                             <option value="17:00">5:00 PM</option>
                                         </optgroup>
                                     </select>
+                                    <!-- Custom Select Arrow -->
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <!-- Loading State Indicator -->
+                                <div id="timeLoadingIndicator" class="hidden mt-2">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                                        <span class="text-sm text-gray-500">Loading available times...</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -156,88 +171,144 @@
     </div>
 </div>
 
+<style>
+/* Custom styles for the select element */
+select option:disabled {
+    color: #9CA3AF;
+    background-color: #F3F4F6;
+}
+
+select optgroup {
+    font-weight: 600;
+    color: #374151;
+    background-color: #F9FAFB;
+    padding: 8px 0;
+}
+
+select option {
+    padding: 8px 12px;
+    transition: background-color 0.2s;
+}
+
+select option:not(:disabled):hover {
+    background-color: #EFF6FF;
+}
+
+/* Loading state styles */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>
+
 <script>
-document.getElementById('date').addEventListener('change', function() {
-    const date = this.value;
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('date');
     const timeSelect = document.getElementById('time');
-    
-    if (date) {
-        timeSelect.disabled = true;
-        timeSelect.innerHTML = '<option value="">Loading available times...</option>';
+    const loadingIndicator = document.getElementById('timeLoadingIndicator');
 
-        const baseUrl = '{{ url("/") }}';
-        const url = `${baseUrl}/admin/appointments/available-times?date=${date}`;
+    if (!dateInput || !timeSelect) return;
 
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            timeSelect.innerHTML = '<option value="">Select time</option>';
-            
-            const morningGroup = document.createElement('optgroup');
-            morningGroup.label = 'Morning (9 AM - 12 PM)';
-            
-            const afternoonGroup = document.createElement('optgroup');
-            afternoonGroup.label = 'Afternoon (1 PM - 5 PM)';
-
-            const morningSlots = [
-                { value: '09:00', label: '9:00 AM' },
-                { value: '09:30', label: '9:30 AM' },
-                { value: '10:00', label: '10:00 AM' },
-                { value: '10:30', label: '10:30 AM' },
-                { value: '11:00', label: '11:00 AM' },
-                { value: '11:30', label: '11:30 AM' },
-                { value: '12:00', label: '12:00 PM' }
-            ];
-
-            const afternoonSlots = [
-                { value: '13:00', label: '1:00 PM' },
-                { value: '13:30', label: '1:30 PM' },
-                { value: '14:00', label: '2:00 PM' },
-                { value: '14:30', label: '2:30 PM' },
-                { value: '15:00', label: '3:00 PM' },
-                { value: '15:30', label: '3:30 PM' },
-                { value: '16:00', label: '4:00 PM' },
-                { value: '16:30', label: '4:30 PM' },
-                { value: '17:00', label: '5:00 PM' }
-            ];
-
-            morningSlots.forEach(slot => {
-                const option = document.createElement('option');
-                option.value = slot.value;
-                option.textContent = slot.label;
-                option.disabled = data.bookedTimes.includes(slot.value);
-                morningGroup.appendChild(option);
-            });
-
-            afternoonSlots.forEach(slot => {
-                const option = document.createElement('option');
-                option.value = slot.value;
-                option.textContent = slot.label;
-                option.disabled = data.bookedTimes.includes(slot.value);
-                afternoonGroup.appendChild(option);
-            });
-
-            timeSelect.appendChild(morningGroup);
-            timeSelect.appendChild(afternoonGroup);
-            timeSelect.disabled = false;
-        })
-        .catch(error => {
-            timeSelect.innerHTML = '<option value="">Error loading times</option>';
+    dateInput.addEventListener('change', function() {
+        const date = this.value;
+        
+        if (date) {
             timeSelect.disabled = true;
-        });
+            loadingIndicator.classList.remove('hidden');
+
+            const baseUrl = '{{ url("/") }}';
+            const url = `${baseUrl}/admin/appointments/available-times?date=${date}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                timeSelect.innerHTML = '<option value="">Select available time</option>';
+                
+                const morningGroup = document.createElement('optgroup');
+                morningGroup.label = 'Morning (9 AM - 12 PM)';
+                morningGroup.className = 'text-gray-900 font-medium';
+                
+                const afternoonGroup = document.createElement('optgroup');
+                afternoonGroup.label = 'Afternoon (1 PM - 5 PM)';
+                afternoonGroup.className = 'text-gray-900 font-medium';
+
+                const morningSlots = [
+                    { value: '09:00', label: '9:00 AM' },
+                    { value: '09:30', label: '9:30 AM' },
+                    { value: '10:00', label: '10:00 AM' },
+                    { value: '10:30', label: '10:30 AM' },
+                    { value: '11:00', label: '11:00 AM' },
+                    { value: '11:30', label: '11:30 AM' },
+                    { value: '12:00', label: '12:00 PM' }
+                ];
+
+                const afternoonSlots = [
+                    { value: '13:00', label: '1:00 PM' },
+                    { value: '13:30', label: '1:30 PM' },
+                    { value: '14:00', label: '2:00 PM' },
+                    { value: '14:30', label: '2:30 PM' },
+                    { value: '15:00', label: '3:00 PM' },
+                    { value: '15:30', label: '3:30 PM' },
+                    { value: '16:00', label: '4:00 PM' },
+                    { value: '16:30', label: '4:30 PM' },
+                    { value: '17:00', label: '5:00 PM' }
+                ];
+
+                const createTimeOption = (slot, isBooked) => {
+                    const option = document.createElement('option');
+                    option.value = slot.value;
+                    option.textContent = slot.label;
+                    option.disabled = isBooked;
+                    option.className = isBooked ? 'text-gray-400' : 'text-gray-900';
+                    return option;
+                };
+
+                morningSlots.forEach(slot => {
+                    morningGroup.appendChild(
+                        createTimeOption(slot, data.bookedTimes.includes(slot.value))
+                    );
+                });
+
+                afternoonSlots.forEach(slot => {
+                    afternoonGroup.appendChild(
+                        createTimeOption(slot, data.bookedTimes.includes(slot.value))
+                    );
+                });
+
+                timeSelect.appendChild(morningGroup);
+                timeSelect.appendChild(afternoonGroup);
+            })
+            .catch(() => {
+                timeSelect.innerHTML = '<option value="">Error loading times</option>';
+            })
+            .finally(() => {
+                timeSelect.disabled = false;
+                loadingIndicator.classList.add('hidden');
+            });
+        }
+    });
+
+    if (dateInput.value) {
+        dateInput.dispatchEvent(new Event('change'));
     }
 });
 </script> 
