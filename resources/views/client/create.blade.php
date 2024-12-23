@@ -220,7 +220,6 @@
                                             <option value="10:30">10:30 AM</option>
                                             <option value="11:00">11:00 AM</option>
                                             <option value="11:30">11:30 AM</option>
-                                            <option value="12:00">12:00 PM</option>
                                         </optgroup>
                                         <optgroup label="Afternoon (1 PM - 5 PM)" class="text-gray-900 font-medium">
                                             <option value="13:00">1:00 PM</option>
@@ -490,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 timeSelect.innerHTML = '<option value="">Select available time</option>';
                 
                 const morningGroup = document.createElement('optgroup');
-                morningGroup.label = 'Morning (9 AM - 12 PM)';
+                morningGroup.label = 'Morning (9 AM - 11:30 AM)';
                 morningGroup.className = 'text-gray-900 font-medium';
                 
                 const afternoonGroup = document.createElement('optgroup');
@@ -503,8 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     { value: '10:00', label: '10:00 AM' },
                     { value: '10:30', label: '10:30 AM' },
                     { value: '11:00', label: '11:00 AM' },
-                    { value: '11:30', label: '11:30 AM' },
-                    { value: '12:00', label: '12:00 PM' }
+                    { value: '11:30', label: '11:30 AM' }
                 ];
 
                 const afternoonSlots = [
