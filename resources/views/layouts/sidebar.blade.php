@@ -119,13 +119,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Panel Footer -->
-                    <div class="p-4 border-t border-gray-200">
-                        <button class=" w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium">
-                            Mark all as read
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -301,6 +294,7 @@
             
             // Function to mark notification as read
             window.markAsRead = function(id) {
+                // Only make the API call if the notification is unread
                 fetch(`/notifications/${id}/read`, {
                     method: 'POST',
                     headers: {
@@ -310,7 +304,7 @@
                 })
                 .then(response => response.json())
                 .then(() => {
-                    fetchNotifications();
+                    fetchNotifications(); // Refresh the notifications
                 })
                 .catch(error => console.error('Error marking notification as read:', error));
             }
@@ -350,25 +344,21 @@
                     // Update notification panel content
                     const notificationContent = document.querySelector('#notificationPanel .overflow-y-auto');
                     if (notificationContent) {
-                        // Group notifications by today and earlier
-                        const today = data.notifications.filter(n => 
-                            new Date(n.created_at).toDateString() === new Date().toDateString()
-                        );
-                        const earlier = data.notifications.filter(n => 
-                            new Date(n.created_at).toDateString() !== new Date().toDateString()
-                        );
+                        // Get notifications from the grouped data
+                        const todayNotifications = data.notifications.today || [];
+                        const earlierNotifications = data.notifications.earlier || [];
 
                         // Update the panel content
                         notificationContent.innerHTML = `
-                            ${renderNotificationGroup('Today', today)}
-                            ${renderNotificationGroup('Earlier', earlier)}
+                            ${renderNotificationGroup('Today', todayNotifications)}
+                            ${renderNotificationGroup('Earlier', earlierNotifications)}
                         `;
 
                         // If no notifications, show a message
-                        if (data.notifications.length === 0) {
+                        if (todayNotifications.length === 0 && earlierNotifications.length === 0) {
                             notificationContent.innerHTML = `
                                 <div class="p-4 text-center text-gray-500">
-                                    No new notifications
+                                    No notifications
                                 </div>
                             `;
                         }
@@ -379,27 +369,31 @@
 
         // Function to render notification groups
         function renderNotificationGroup(title, notifications) {
-            if (!notifications.length) return '';
+            if (!notifications || notifications.length === 0) return '';
             
             return `
                 <div class="p-4 ${title === 'Earlier' ? 'border-t border-gray-100' : ''}">
                     <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">${title}</h3>
                     ${notifications.map(notification => `
-                        <div class="mb-4 p-3 bg-${getNotificationColor(notification.type)}-50 rounded-lg border border-${getNotificationColor(notification.type)}-100">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 bg-${getNotificationColor(notification.type)}-100 rounded-full p-2 mr-3">
-                                    ${getNotificationIcon(notification.type)}
+                        <div class="mb-4 p-3 bg-${getNotificationColor(notification.type)}-50 rounded-lg border border-${getNotificationColor(notification.type)}-100 relative group">
+                            ${!notification.is_read ? `
+                                <div class="absolute w-2 h-2 bg-blue-500 rounded-full top-2 right-2"></div>
+                            ` : ''}
+                            
+                            <div class="cursor-pointer" onclick="markAsRead(${notification.id})">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-${getNotificationColor(notification.type)}-100 rounded-full p-2 mr-3">
+                                        ${getNotificationIcon(notification.type)}
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900 ${!notification.is_read ? 'font-bold' : ''}">${notification.title || 'Notification'}</p>
+                                        <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
+                                        <p class="mt-1 text-xs text-gray-500">${formatTime(notification.created_at)}</p>
+                                        ${notification.is_read ? `
+                                            <span class="text-xs text-gray-400">Read ${formatTime(notification.read_at)}</span>
+                                        ` : ''}
+                                    </div>
                                 </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-900">${notification.title}</p>
-                                    <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
-                                    <p class="mt-1 text-xs text-gray-500">${formatTime(notification.created_at)}</p>
-                                </div>
-                                <button onclick="markAsRead(${notification.id})" class="ml-2 text-gray-400 hover:text-gray-500">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
                             </div>
                         </div>
                     `).join('')}

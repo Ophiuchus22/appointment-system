@@ -10,13 +10,17 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Notification::with('appointment')
-            ->where('is_read', false)
             ->latest()
-            ->get();
+            ->get()
+            ->groupBy(function($notification) {
+                return $notification->created_at->isToday() ? 'today' : 'earlier';
+            });
+
+        $unreadCount = Notification::where('is_read', false)->count();
 
         return response()->json([
             'notifications' => $notifications,
-            'count' => $notifications->count()
+            'count' => $unreadCount
         ]);
     }
 
