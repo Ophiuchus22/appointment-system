@@ -259,7 +259,7 @@ class ExternalAppointmentController extends Controller
             return redirect('/admin/appointments')->with('success', 'Appointment updated successfully');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'An error occurred while updating the appointment: ' . $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 } 
