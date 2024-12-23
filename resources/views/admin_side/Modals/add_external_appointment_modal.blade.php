@@ -87,8 +87,32 @@
                             <!-- Time -->
                             <div>
                                 <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                                <input type="time" name="time" id="time" required
-                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div class="relative">
+                                    <select name="time" id="time" required
+                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select time</option>
+                                        <optgroup label="Morning (9 AM - 12 PM)">
+                                            <option value="09:00">9:00 AM</option>
+                                            <option value="09:30">9:30 AM</option>
+                                            <option value="10:00">10:00 AM</option>
+                                            <option value="10:30">10:30 AM</option>
+                                            <option value="11:00">11:00 AM</option>
+                                            <option value="11:30">11:30 AM</option>
+                                            <option value="12:00">12:00 PM</option>
+                                        </optgroup>
+                                        <optgroup label="Afternoon (1 PM - 5 PM)">
+                                            <option value="13:00">1:00 PM</option>
+                                            <option value="13:30">1:30 PM</option>
+                                            <option value="14:00">2:00 PM</option>
+                                            <option value="14:30">2:30 PM</option>
+                                            <option value="15:00">3:00 PM</option>
+                                            <option value="15:30">3:30 PM</option>
+                                            <option value="16:00">4:00 PM</option>
+                                            <option value="16:30">4:30 PM</option>
+                                            <option value="17:00">5:00 PM</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
                             </div>
 
                             <!-- Purpose -->
@@ -130,4 +154,90 @@
             </form>
         </div>
     </div>
-</div> 
+</div>
+
+<script>
+document.getElementById('date').addEventListener('change', function() {
+    const date = this.value;
+    const timeSelect = document.getElementById('time');
+    
+    if (date) {
+        timeSelect.disabled = true;
+        timeSelect.innerHTML = '<option value="">Loading available times...</option>';
+
+        const baseUrl = '{{ url("/") }}';
+        const url = `${baseUrl}/admin/appointments/available-times?date=${date}`;
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            timeSelect.innerHTML = '<option value="">Select time</option>';
+            
+            const morningGroup = document.createElement('optgroup');
+            morningGroup.label = 'Morning (9 AM - 12 PM)';
+            
+            const afternoonGroup = document.createElement('optgroup');
+            afternoonGroup.label = 'Afternoon (1 PM - 5 PM)';
+
+            const morningSlots = [
+                { value: '09:00', label: '9:00 AM' },
+                { value: '09:30', label: '9:30 AM' },
+                { value: '10:00', label: '10:00 AM' },
+                { value: '10:30', label: '10:30 AM' },
+                { value: '11:00', label: '11:00 AM' },
+                { value: '11:30', label: '11:30 AM' },
+                { value: '12:00', label: '12:00 PM' }
+            ];
+
+            const afternoonSlots = [
+                { value: '13:00', label: '1:00 PM' },
+                { value: '13:30', label: '1:30 PM' },
+                { value: '14:00', label: '2:00 PM' },
+                { value: '14:30', label: '2:30 PM' },
+                { value: '15:00', label: '3:00 PM' },
+                { value: '15:30', label: '3:30 PM' },
+                { value: '16:00', label: '4:00 PM' },
+                { value: '16:30', label: '4:30 PM' },
+                { value: '17:00', label: '5:00 PM' }
+            ];
+
+            morningSlots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot.value;
+                option.textContent = slot.label;
+                option.disabled = data.bookedTimes.includes(slot.value);
+                morningGroup.appendChild(option);
+            });
+
+            afternoonSlots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot.value;
+                option.textContent = slot.label;
+                option.disabled = data.bookedTimes.includes(slot.value);
+                afternoonGroup.appendChild(option);
+            });
+
+            timeSelect.appendChild(morningGroup);
+            timeSelect.appendChild(afternoonGroup);
+            timeSelect.disabled = false;
+        })
+        .catch(error => {
+            timeSelect.innerHTML = '<option value="">Error loading times</option>';
+            timeSelect.disabled = true;
+        });
+    }
+});
+</script> 

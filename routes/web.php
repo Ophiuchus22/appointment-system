@@ -43,14 +43,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{appointment}', [InternalAppointmentController::class, 'destroy'])->name('destroy');
     });
 
-    // Add these routes inside the authenticated middleware group
+    // Move this route OUTSIDE the admin prefix group but keep it inside auth middleware
+    Route::get('admin/appointments/available-times', [ExternalAppointmentController::class, 'getAvailableTimes'])
+        ->name('admin.appointments.available-times');
+
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-        Route::get('/appointments', [ExternalAppointmentController::class, 'index'])->name('appointments.index');
+        Route::get('/appointments', [ExternalAppointmentController::class, 'index'])->name('admin.appointments.index');
         Route::post('/appointments/store', [ExternalAppointmentController::class, 'store'])->name('appointments.store');
         Route::get('/appointments/{id}', [ExternalAppointmentController::class, 'show'])->name('admin.appointments.show');
         Route::patch('/appointments/{appointment}/confirm', [ExternalAppointmentController::class, 'confirm'])->name('appointments.confirm');
@@ -65,6 +68,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::delete('/notifications/delete-all', [NotificationController::class, 'deleteAll'])->name('notifications.deleteAll');
+
+    // Add this route for internal appointments
+    Route::get('/client/appointments/available-times', [InternalAppointmentController::class, 'getAvailableTimes'])
+        ->name('client.appointments.available-times');
+
+    // Client routes
+    Route::prefix('client')->name('client.')->group(function () {
+        Route::get('appointments/available-times', [InternalAppointmentController::class, 'getAvailableTimes'])
+            ->name('appointments.available-times');
+        // ... other routes ...
+    });
 });
+
 
 require __DIR__.'/auth.php';

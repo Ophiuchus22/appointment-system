@@ -227,4 +227,27 @@ class InternalAppointmentController extends Controller
             return back()->with('error', 'An error occurred while cancelling the appointment');
         }
     }
+
+    public function getAvailableTimes(Request $request)
+    {
+        try {
+            $date = $request->get('date');
+            $bookedTimes = Appointment::where('date', $date)
+                ->pluck('time')
+                ->map(function($time) {
+                    return $time->format('H:i');
+                })
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'bookedTimes' => $bookedTimes
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching available times'
+            ], 500);
+        }
+    }
 }
