@@ -71,6 +71,87 @@
             </div>
         </div>
 
+        <div class="relative px-4">
+            <!-- Notification Bell Button -->
+            <button id="notificationButton" class="nav-item flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800/50 hover:text-white rounded-lg transition-all duration-200 group">
+                <div class="relative">
+                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                </div>
+                <span>Notifications</span>
+            </button>
+
+            <!-- Notification Slide-out Panel -->
+            <div id="notificationPanel" class="fixed left-64 top-0 h-full w-80 bg-white shadow-2xl hidden z-40">
+                <div class="h-full flex flex-col">
+                    <!-- Panel Header -->
+                    <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+                        <h2 class="text-lg font-semibold text-gray-800">Notifications</h2>
+                        <button id="closeNotifications" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Panel Content -->
+                    <div class="flex-1 overflow-y-auto">
+                        <!-- Today's Notifications -->
+                        <div class="p-4">
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Today</h3>
+                            <!-- Notification Item -->
+                            <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm text-gray-900">New appointment request from <span class="font-semibold">John Doe</span></p>
+                                        <p class="mt-1 text-xs text-gray-500">2 hours ago</p>
+                                    </div>
+                                    <button class="ml-2 text-gray-400 hover:text-gray-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earlier Notifications -->
+                        <div class="p-4 border-t border-gray-100">
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Earlier</h3>
+                            <!-- Notification Item -->
+                            <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-gray-100 rounded-full p-2">
+                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm text-gray-900">Appointment with <span class="font-semibold">Jane Smith</span> was confirmed</p>
+                                        <p class="mt-1 text-xs text-gray-500">Yesterday at 4:30 PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Footer -->
+                    <div class="p-4 border-t border-gray-200">
+                        <button class="w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium">
+                            Mark all as read
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <nav class="space-y-2 px-4">
             <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Main Menu</div>
             
@@ -180,6 +261,59 @@
             sidebar.addEventListener('mouseenter', openSidebar);
             edgeTrigger.addEventListener('mouseenter', openSidebar);
             sidebar.addEventListener('mouseleave', closeSidebar);
+        });
+
+        // Replace the existing notification JavaScript with this:
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const notificationPanel = document.getElementById('notificationPanel');
+            const notificationButton = document.getElementById('notificationButton');
+            const closeNotifications = document.getElementById('closeNotifications');
+
+            // Update CSS class for notification panel - remove transform classes
+            notificationPanel.classList.remove('transform', 'translate-x-full', 'transition-transform');
+            notificationPanel.classList.add('hidden'); // Add hidden by default
+
+            // Function to close notification panel
+            function closeNotificationPanel() {
+                notificationPanel.classList.add('hidden');
+            }
+
+            // Open notification panel
+            if (notificationButton) {
+                notificationButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationPanel.classList.remove('hidden');
+                });
+            }
+
+            // Close notification panel with close button
+            if (closeNotifications) {
+                closeNotifications.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeNotificationPanel();
+                });
+            }
+
+            // Close panel when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!notificationPanel.contains(event.target) && !notificationButton.contains(event.target)) {
+                    closeNotificationPanel();
+                }
+            });
+
+            // Close notification panel when sidebar closes
+            sidebar.addEventListener('mouseleave', function() {
+                closeNotificationPanel();
+            });
+
+            // Close notification panel when clicking sidebar trigger
+            document.querySelector('.sidebar-trigger').addEventListener('click', function() {
+                if (!sidebar.classList.contains('active')) {
+                    closeNotificationPanel();
+                }
+            });
         });
     </script>
 </body>
