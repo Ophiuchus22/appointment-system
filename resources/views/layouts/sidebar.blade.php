@@ -310,21 +310,29 @@
                 })
                 .then(response => response.json())
                 .then(() => {
-                    // Fetch notifications only after marking as read
                     fetchNotifications();
                 })
                 .catch(error => console.error('Error marking notification as read:', error));
             }
 
-            // Initial fetch only - removed interval
+            // Only set up notification refresh if we're not on a page that shows success/error messages
             if (notificationButton && notificationPanel) {
-                fetchNotifications();
-            }
+                const hasSuccessMessage = document.getElementById('success-message');
+                const hasErrorMessage = document.getElementById('error-message');
 
-            // Removed: const notificationInterval = setInterval(fetchNotifications, 1000);
-            // Removed: window.addEventListener('beforeunload', () => {
-            //     clearInterval(notificationInterval);
-            // });
+                // Initial fetch
+                fetchNotifications();
+
+                // Only set up interval if we're not on a page with messages
+                if (!hasSuccessMessage && !hasErrorMessage) {
+                    const notificationInterval = setInterval(fetchNotifications, 3000);
+
+                    // Clean up interval when page is unloaded
+                    window.addEventListener('beforeunload', () => {
+                        clearInterval(notificationInterval);
+                    });
+                }
+            }
         });
 
         // Function to fetch notifications
