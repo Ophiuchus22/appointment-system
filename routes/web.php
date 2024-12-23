@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExternalAppointmentController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -58,6 +59,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/appointments/{appointment}', [ExternalAppointmentController::class, 'destroy'])->name('appointments.destroy');
         Route::put('/appointments/{appointment}/update', [ExternalAppointmentController::class, 'update'])
             ->name('appointments.update');
+    });
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     });
 });
 

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Sidebar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -97,7 +98,7 @@
                     </div>
 
                     <!-- Panel Content -->
-                    <div class="flex-1 overflow-y-auto">
+                    <div class="overflow-y-auto flex-1">
                         <!-- Today's Notifications -->
                         <div class="p-4">
                             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Today</h3>
@@ -109,10 +110,6 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                     </div>
-                                    <div class="ml-3 flex-1">
-                                        <p class="text-sm text-gray-900">New appointment request from <span class="font-semibold">John Doe</span></p>
-                                        <p class="mt-1 text-xs text-gray-500">2 hours ago</p>
-                                    </div>
                                     <button class="ml-2 text-gray-400 hover:text-gray-500">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -121,30 +118,11 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Earlier Notifications -->
-                        <div class="p-4 border-t border-gray-100">
-                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Earlier</h3>
-                            <!-- Notification Item -->
-                            <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0 bg-gray-100 rounded-full p-2">
-                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3 flex-1">
-                                        <p class="text-sm text-gray-900">Appointment with <span class="font-semibold">Jane Smith</span> was confirmed</p>
-                                        <p class="mt-1 text-xs text-gray-500">Yesterday at 4:30 PM</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Panel Footer -->
                     <div class="p-4 border-t border-gray-200">
-                        <button class="w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium">
+                        <button class=" w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium">
                             Mark all as read
                         </button>
                     </div>
@@ -315,6 +293,172 @@
                 }
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationButton = document.getElementById('notificationButton');
+            const notificationPanel = document.getElementById('notificationPanel');
+            const notificationBadge = notificationButton?.querySelector('.rounded-full');
+            
+            // Function to mark notification as read
+            window.markAsRead = function(id) {
+                fetch(`/notifications/${id}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(() => {
+                    // Fetch notifications only after marking as read
+                    fetchNotifications();
+                })
+                .catch(error => console.error('Error marking notification as read:', error));
+            }
+
+            // Initial fetch only - removed interval
+            if (notificationButton && notificationPanel) {
+                fetchNotifications();
+            }
+
+            // Removed: const notificationInterval = setInterval(fetchNotifications, 1000);
+            // Removed: window.addEventListener('beforeunload', () => {
+            //     clearInterval(notificationInterval);
+            // });
+        });
+
+        // Function to fetch notifications
+        function fetchNotifications() {
+            fetch('/notifications')
+                .then(response => response.json())
+                .then(data => {
+                    // Update notification count and badge
+                    const notificationBadge = document.querySelector('#notificationButton .rounded-full');
+                    if (notificationBadge) {
+                        notificationBadge.textContent = data.count;
+                        notificationBadge.classList.toggle('hidden', data.count === 0);
+                    }
+                    
+                    // Update notification panel content
+                    const notificationContent = document.querySelector('#notificationPanel .overflow-y-auto');
+                    if (notificationContent) {
+                        // Group notifications by today and earlier
+                        const today = data.notifications.filter(n => 
+                            new Date(n.created_at).toDateString() === new Date().toDateString()
+                        );
+                        const earlier = data.notifications.filter(n => 
+                            new Date(n.created_at).toDateString() !== new Date().toDateString()
+                        );
+
+                        // Update the panel content
+                        notificationContent.innerHTML = `
+                            ${renderNotificationGroup('Today', today)}
+                            ${renderNotificationGroup('Earlier', earlier)}
+                        `;
+
+                        // If no notifications, show a message
+                        if (data.notifications.length === 0) {
+                            notificationContent.innerHTML = `
+                                <div class="p-4 text-center text-gray-500">
+                                    No new notifications
+                                </div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching notifications:', error));
+        }
+
+        // Function to render notification groups
+        function renderNotificationGroup(title, notifications) {
+            if (!notifications.length) return '';
+            
+            return `
+                <div class="p-4 ${title === 'Earlier' ? 'border-t border-gray-100' : ''}">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">${title}</h3>
+                    ${notifications.map(notification => `
+                        <div class="mb-4 p-3 bg-${getNotificationColor(notification.type)}-50 rounded-lg border border-${getNotificationColor(notification.type)}-100">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-${getNotificationColor(notification.type)}-100 rounded-full p-2 mr-3">
+                                    ${getNotificationIcon(notification.type)}
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">${notification.title}</p>
+                                    <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
+                                    <p class="mt-1 text-xs text-gray-500">${formatTime(notification.created_at)}</p>
+                                </div>
+                                <button onclick="markAsRead(${notification.id})" class="ml-2 text-gray-400 hover:text-gray-500">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Function to get notification color based on type
+        function getNotificationColor(type) {
+            switch(type) {
+                case 'unconfirmed': return 'yellow';
+                case 'cancelled': return 'red';
+                case 'upcoming_week':
+                case 'upcoming_day':
+                case 'upcoming_hour':
+                    return 'blue';
+                default: return 'gray';
+            }
+        }
+
+        // Function to get notification icon based on type
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'unconfirmed':
+                    return `<svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+                case 'cancelled':
+                    return `<svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>`;
+                case 'upcoming_week':
+                case 'upcoming_day':
+                case 'upcoming_hour':
+                    return `<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>`;
+                default:
+                    return `<svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+            }
+        }
+
+        // Function to format time
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (minutes < 60) {
+                return minutes <= 1 ? 'Just now' : `${minutes} minutes ago`;
+            } else if (hours < 24) {
+                return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+            } else if (days < 7) {
+                return days === 1 ? 'Yesterday' : `${days} days ago`;
+            } else {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
     </script>
 </body>
 </html>

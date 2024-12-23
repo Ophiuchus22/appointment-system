@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Carbon\Carbon;
+use App\Models\Notification;
 
 class InternalAppointmentController extends Controller
 {
@@ -80,6 +81,14 @@ class InternalAppointmentController extends Controller
             $appointment->description = $validated['description'];
             $appointment->appointment_type = 'Internal';
             $appointment->save();
+
+            // Add notification for new appointment
+            Notification::create([
+                'appointment_id' => $appointment->id,
+                'type' => 'new_appointment',
+                'title' => 'New Appointment Created',
+                'message' => "New appointment scheduled for " . Carbon::parse($appointment->date)->format('M d, Y') . " at " . Carbon::parse($appointment->time)->format('h:i A')
+            ]);
 
             return redirect()->route('client.appointments.create')
                 ->with('success', 'Your appointment has been successfully scheduled!');
@@ -198,29 +207,24 @@ class InternalAppointmentController extends Controller
     public function cancel(Appointment $appointment)
     {
         try {
-            // Check if user owns this appointment
-            if ($appointment->user_id !== Auth::id()) {
-                return redirect()->route('client.appointments.viewAppointment')
-                    ->with('error', 'Unauthorized access.');
+            if ($appointment->user_id !== auth()->id()) {
+                return back()->with('error', 'Unauthorized action.');
             }
 
-            // Check if appointment can be cancelled
-            if (!in_array($appointment->status, ['pending', 'approved'])) {
-                return redirect()->route('client.appointments.viewAppointment')
-                    ->with('error', 'This appointment cannot be cancelled.');
-            }
+            $appointment->update(['status' => 'cancelled']);
 
-            // Cancel the appointment
-            $appointment->status = 'cancelled';
-            $appointment->save();
+            // Create notification
+            Notification::create([
+                'appointment_id' => $appointment->id,
+                'type' => 'cancelled',
+                'title' => 'Appointment Cancelled',
+                'message' => "Appointment for " . Carbon::parse($appointment->date)->format('M d, Y') . " at " . Carbon::parse($appointment->time)->format('h:i A') . " has been cancelled by user."
+            ]);
 
-            return redirect()->route('client.appointments.viewAppointment')
-                ->with('success', 'Appointment cancelled successfully.');
-
-        } catch (Exception $e) {
-            logger()->error('Appointment cancellation failed: ' . $e->getMessage());
-            return redirect()->route('client.appointments.viewAppointment')
-                ->with('error', 'Unable to cancel appointment. Please try again later.');
+            return back()->with('success', 'Appointment cancelled successfully.');
+        } catch (\Exception $e) {
+            \Log::error('User cancellation error: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while cancelling the appointment');
         }
     }
 }
