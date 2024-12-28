@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExternalAppointmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientReportController;
+use App\Http\Controllers\AdminReportController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -85,7 +86,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::controller(ClientReportController::class)->group(function () {
         Route::get('/client/report/generate', 'generate')->name('client.report.generate');
     });
+
+    Route::middleware(['auth', 'admin'])->group(function () {
+        // ... other admin routes ...
+        Route::get('/admin/report/generate', [AdminReportController::class, 'generate'])
+            ->name('admin.report.generate');
+        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+        Route::post('/admin/reports/generate', [AdminReportController::class, 'generate'])->name('admin.reports.generate');
+    });
 });
 
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
+    Route::post('/reports/generate', [AdminReportController::class, 'generate'])->name('admin.reports.generate');
+});
 
 require __DIR__.'/auth.php';
