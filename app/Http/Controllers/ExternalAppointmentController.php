@@ -10,8 +10,23 @@ use App\Mail\AppointmentConfirmed;
 use App\Mail\AppointmentCancelled;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Handles external appointment management
+ * 
+ * This controller manages appointments for external clients/visitors including:
+ * - Listing all appointments
+ * - Creating new appointments
+ * - Updating appointment status (confirm, cancel, complete)
+ * - Managing appointment schedules
+ * - Sending email notifications
+ */
 class ExternalAppointmentController extends Controller
 {
+    /**
+     * Display a listing of appointments
+     * 
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $appointments = Appointment::with('user')
@@ -22,6 +37,17 @@ class ExternalAppointmentController extends Controller
         return view('admin_side.appointments', compact('appointments'));
     }
 
+    /**
+     * Store a new external appointment
+     * 
+     * Validates and stores appointment details including:
+     * - Personal information
+     * - Schedule details
+     * - Purpose and description
+     * 
+     * @param Request $request Contains appointment details
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
         try {
@@ -101,12 +127,24 @@ class ExternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Display appointment details
+     * 
+     * @param int $id Appointment ID
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         $appointment = Appointment::with('user')->findOrFail($id);
         return response()->json($appointment);
     }
 
+    /**
+     * Confirm an appointment and send email notification
+     * 
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function confirm(Appointment $appointment)
     {
         try {
@@ -129,6 +167,12 @@ class ExternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Cancel an appointment and send email notification
+     * 
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function cancel(Appointment $appointment)
     {
         try {
@@ -151,6 +195,12 @@ class ExternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Mark an appointment as completed
+     * 
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function complete(Appointment $appointment)
     {
         try {
@@ -165,6 +215,12 @@ class ExternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Delete an appointment
+     * 
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Appointment $appointment)
     {
         try {
@@ -179,6 +235,13 @@ class ExternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Update appointment details and send notification if schedule changes
+     * 
+     * @param Request $request
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, Appointment $appointment)
     {
         try {
@@ -263,6 +326,12 @@ class ExternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Get available time slots for a specific date
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAvailableTimes(Request $request)
     {
         try {

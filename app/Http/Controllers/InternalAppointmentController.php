@@ -9,13 +9,34 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Notification;
 
+/**
+ * Handles internal appointment management
+ * 
+ * This controller manages appointments for internal users including:
+ * - Creating new appointments
+ * - Viewing user's appointments
+ * - Updating appointment details
+ * - Managing appointment schedules
+ * - Handling appointment cancellations
+ * - Managing time slot availability
+ */
 class InternalAppointmentController extends Controller
 {
+    /**
+     * Show the appointment creation form
+     * 
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
         return view('client.create');
     }
 
+    /**
+     * Display user's appointments
+     * 
+     * @return \Illuminate\View\View
+     */
     public function viewAppointment()
     {
         $appointments = Appointment::where('user_id', Auth::id())
@@ -25,6 +46,18 @@ class InternalAppointmentController extends Controller
         return view('client.viewAppointment', compact('appointments'));
     }
 
+    /**
+     * Store a new internal appointment
+     * 
+     * Validates and stores appointment details including:
+     * - Contact information
+     * - Schedule details
+     * - Purpose and description
+     * - Creates associated notification
+     * 
+     * @param Request $request Contains appointment details
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
         try {
@@ -36,7 +69,7 @@ class InternalAppointmentController extends Controller
                     'required',
                     'date_format:H:i',
                     function ($attribute, $value, $fail) {
-                        $time = \Carbon\Carbon::createFromFormat('H:i', $value);
+                        $time = Carbon::createFromFormat('H:i', $value);
                         $hour = (int) $time->format('H');
                         $minute = (int) $time->format('i');
 
@@ -113,6 +146,13 @@ class InternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Update an existing appointment
+     * 
+     * @param Request $request Contains updated appointment details
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, Appointment $appointment)
     {
         try {
@@ -204,6 +244,12 @@ class InternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Cancel an appointment
+     * 
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function cancel(Appointment $appointment)
     {
         try {
@@ -228,6 +274,12 @@ class InternalAppointmentController extends Controller
         }
     }
 
+    /**
+     * Get available time slots for a specific date
+     * 
+     * @param Request $request Contains date parameter
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAvailableTimes(Request $request)
     {
         try {

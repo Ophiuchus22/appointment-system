@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Represents a user in the system
+ * 
+ * This model handles user data including:
+ * - Authentication information
+ * - Role management (admin/user)
+ * - College office assignments
+ * - Password security
+ * - Factory creation for testing
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */

@@ -7,14 +7,40 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
+/**
+ * Handles user management operations
+ * 
+ * This controller manages administrative user operations including:
+ * - Listing all users
+ * - Creating new users (admin/regular)
+ * - Editing user details
+ * - Managing user roles and college offices
+ * - User deletion with admin protection
+ */
 class UserController extends Controller
 {
+    /**
+     * Display a listing of all users
+     * 
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $users = User::all();
         return view('admin_side.users', compact('users'));
     }
 
+    /**
+     * Store a newly created user
+     * 
+     * Handles user creation with:
+     * - Role-based validation
+     * - Password hashing
+     * - College office assignment for regular users
+     * 
+     * @param Request $request Contains user details and role
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
         // Validate base requirements
@@ -51,12 +77,30 @@ class UserController extends Controller
             ->with('success', 'User created successfully');
     }
 
+    /**
+     * Get user details for editing
+     * 
+     * @param int $id User ID
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function edit($id)
     {
         $user = User::findOrFail($id);
         return response()->json($user);
     }
 
+    /**
+     * Update user details
+     * 
+     * Handles updates including:
+     * - Basic information
+     * - Role-specific fields
+     * - Optional password change
+     * 
+     * @param Request $request Contains updated user details
+     * @param int $id User ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -99,6 +143,14 @@ class UserController extends Controller
             ->with('success', 'User updated successfully');
     }
 
+    /**
+     * Delete a user
+     * 
+     * Includes protection against deleting the last admin user
+     * 
+     * @param int $id User ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy($id)
     {
         try {

@@ -7,6 +7,16 @@ use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
+/**
+ * Checks and creates appointment notifications
+ * 
+ * This command handles automated notification generation for:
+ * - Unconfirmed appointments (after 1 hour)
+ * - Upcoming appointments at different intervals:
+ *   - 1 week before
+ *   - 24 hours before
+ *   - 1 hour before
+ */
 class CheckAppointmentNotifications extends Command
 {
     /**
@@ -25,6 +35,8 @@ class CheckAppointmentNotifications extends Command
 
     /**
      * Execute the console command.
+     * 
+     * Runs notification checks for both unconfirmed and upcoming appointments
      */
     public function handle()
     {
@@ -37,6 +49,12 @@ class CheckAppointmentNotifications extends Command
         $this->info('Notifications check completed!');
     }
 
+    /**
+     * Check and create notifications for unconfirmed appointments
+     * 
+     * Creates notifications for appointments that remain unconfirmed
+     * after one hour of creation
+     */
     private function checkUnconfirmedAppointments()
     {
         Appointment::where('status', 'pending')
@@ -54,6 +72,14 @@ class CheckAppointmentNotifications extends Command
             });
     }
 
+    /**
+     * Check and create notifications for upcoming appointments
+     * 
+     * Creates notifications at different time intervals:
+     * - 1 week before appointment
+     * - 24 hours before appointment
+     * - 1 hour before appointment
+     */
     private function checkUpcomingAppointments()
     {
         Appointment::where('status', 'confirmed')
@@ -79,6 +105,13 @@ class CheckAppointmentNotifications extends Command
             });
     }
 
+    /**
+     * Create a notification for an upcoming appointment
+     * 
+     * @param Appointment $appointment The appointment to create notification for
+     * @param string $type Notification type (upcoming_week/upcoming_day/upcoming_hour)
+     * @param string $timeframe Human-readable time frame (1 Week/24 Hours/1 Hour)
+     */
     private function createUpcomingNotification($appointment, $type, $timeframe)
     {
         // Check if notification already exists

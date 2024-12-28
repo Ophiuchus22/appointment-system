@@ -7,8 +7,31 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+/**
+ * Handles the admin dashboard functionality and calendar view
+ * 
+ * This controller manages the admin dashboard which includes:
+ * - Calendar view (monthly/weekly) of appointments
+ * - Appointment statistics (upcoming, pending, completed)
+ * - Recent activity tracking
+ * - AJAX-based calendar updates
+ */
 class DashboardController extends Controller
 {
+    /**
+     * Display the admin dashboard with calendar and statistics
+     * 
+     * This method handles:
+     * - User role verification
+     * - Calendar view type (month/week)
+     * - Date range calculations
+     * - Appointment fetching and grouping
+     * - Statistics compilation
+     * - AJAX requests for calendar updates
+     * 
+     * @param Request $request Contains view type and date parameters
+     * @return \Illuminate\View\View|\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|string Returns dashboard view or calendar grid for AJAX
+     */
     public function index(Request $request)
     {
         // Check if user is admin
@@ -87,6 +110,16 @@ class DashboardController extends Controller
         ));
     }
 
+    /**
+     * Get recent appointment activities
+     * 
+     * Retrieves and formats the 10 most recent appointment activities including:
+     * - New appointments
+     * - Status updates
+     * - Appointment modifications
+     * 
+     * @return \Illuminate\Support\Collection Collection of formatted activity data
+     */
     private function getRecentActivities()
     {
         // Get appointments with their associated users, ordered by latest first

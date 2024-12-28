@@ -9,13 +9,46 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
+/**
+ * Handles the generation and management of administrative reports
+ * 
+ * This controller manages the creation of detailed PDF reports for administrative purposes.
+ * It can generate different types of reports including:
+ * - Appointment Overview: Shows appointment statistics, college-wise distribution, and daily trends
+ * - User Activity: Displays the most active users and their appointment frequencies
+ * - Purpose Analysis: Analyzes common purposes for appointments
+ * 
+ * The reports can be generated individually or combined based on user selection.
+ */
 class AdminReportController extends Controller
 {
+    /**
+     * Display the report generation page
+     * 
+     * This method shows the interface where administrators can select
+     * which types of reports they want to generate.
+     * 
+     * @return \Illuminate\View\View Returns the report selection page view
+     */
     public function index()
     {
         return view('admin_side.report.index');
     }
 
+    /**
+     * Generate a PDF report based on selected report types
+     * 
+     * This method processes the selected report types and generates a comprehensive PDF report.
+     * It can include:
+     * - Appointment Statistics: Total counts by status
+     * - College-wise Distribution: Appointment counts per college office
+     * - Daily Trends: Last 30 days appointment creation pattern
+     * - Top 5 Most Active Users: Users with most appointments
+     * - Top 5 Common Purposes: Most frequent appointment purposes
+     * 
+     * @param Request $request Contains the selected report types in 'report_types' array
+     * @return \Illuminate\Http\Response Returns the downloaded PDF
+     */
     public function generate(Request $request)
     {
         $reportTypes = $request->input('report_types', []);

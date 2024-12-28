@@ -5,8 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 
+/**
+ * Handles notification management
+ * 
+ * This controller manages system notifications including:
+ * - Retrieving notifications with their related appointments
+ * - Grouping notifications by date (today/earlier)
+ * - Marking notifications as read
+ * - Bulk deletion of notifications
+ */
 class NotificationController extends Controller
 {
+    /**
+     * Get all notifications grouped by date
+     * 
+     * Retrieves notifications and:
+     * - Groups them by today/earlier
+     * - Includes related appointment data
+     * - Counts unread notifications
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         $notifications = Notification::with('appointment')
@@ -24,6 +43,12 @@ class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Mark a notification as read
+     * 
+     * @param int $id Notification ID
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function markAsRead($id)
     {
         $notification = Notification::findOrFail($id);
@@ -35,6 +60,11 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Delete all notifications
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function deleteAll()
     {
         try {
