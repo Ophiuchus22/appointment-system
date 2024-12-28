@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExternalAppointmentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ClientReportController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -78,6 +79,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('appointments/available-times', [InternalAppointmentController::class, 'getAvailableTimes'])
             ->name('appointments.available-times');
         // ... other routes ...
+    });
+
+    // Client Report Routes
+    Route::controller(ClientReportController::class)->group(function () {
+        Route::get('/client/report/generate', 'generate')->name('client.report.generate');
     });
 });
 
