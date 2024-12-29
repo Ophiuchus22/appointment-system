@@ -133,7 +133,14 @@ function viewAppointmentDetails(appointmentId) {
             document.getElementById('appointmentCompany').textContent = appointment.company_name || 'N/A';
             document.getElementById('appointmentAddress').textContent = appointment.address || 'N/A';
             document.getElementById('appointmentDate').textContent = moment(appointment.date).format('MMMM D, YYYY');
-            document.getElementById('appointmentTime').textContent = moment(appointment.time, 'HH:mm:ss').format('h:mm A');
+
+            // Extract time and convert to 12-hour format
+            const timeOnly = appointment.time.split(' ')[1];
+            const [hours, minutes] = timeOnly.split(':');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const hours12 = hours % 12 || 12; // Convert to 12-hour format
+            const formattedTime = `${hours12}:${minutes} ${ampm}`;
+            document.getElementById('appointmentTime').textContent = formattedTime;
             document.getElementById('appointmentPurpose').textContent = appointment.purpose;
             document.getElementById('appointmentDescription').textContent = appointment.description;
 
