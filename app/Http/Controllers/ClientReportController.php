@@ -44,11 +44,14 @@ class ClientReportController extends Controller
             return $appointment;
         });
 
+        // Fix timezone for generation timestamp
+        $generated_at = now()->setTimezone('Asia/Manila')->format('F j, Y g:i A');
+
         // Generate PDF
         $pdf = PDF::loadView('client.report.client_pdf', [
             'appointments' => $appointments,
             'user' => auth()->user(),
-            'generated_at' => now()->format('F j, Y g:i A')
+            'generated_at' => $generated_at
         ]);
 
         // Download the PDF

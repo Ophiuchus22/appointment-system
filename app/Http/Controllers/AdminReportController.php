@@ -53,7 +53,7 @@ class AdminReportController extends Controller
     {
         $reportTypes = $request->input('report_types', []);
         $data = [
-            'generated_at' => now()->format('F j, Y g:i A'),
+            'generated_at' => now()->setTimezone('Asia/Manila')->format('F j, Y g:i A'),
             'reportTypes' => $reportTypes
         ];
 
