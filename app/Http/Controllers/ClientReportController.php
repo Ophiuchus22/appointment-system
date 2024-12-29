@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Appointment;
 use Carbon\Carbon;
+use App\Traits\LogsActivity;
 
 /**
  * Handles the generation of client-specific appointment reports
@@ -19,6 +20,8 @@ use Carbon\Carbon;
  */
 class ClientReportController extends Controller
 {
+    use LogsActivity;
+
     /**
      * Generate a PDF report of the authenticated user's appointments
      * 
@@ -53,6 +56,9 @@ class ClientReportController extends Controller
             'user' => auth()->user(),
             'generated_at' => $generated_at
         ]);
+
+        // Log the report generation
+        $this->logActivity('generate_report');
 
         // Download the PDF
         return $pdf->download('appointments-report.pdf');

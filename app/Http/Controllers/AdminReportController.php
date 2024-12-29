@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -22,6 +23,8 @@ use Illuminate\Http\Request;
  */
 class AdminReportController extends Controller
 {
+    use LogsActivity;
+
     /**
      * Display the report generation page
      * 
@@ -95,6 +98,14 @@ class AdminReportController extends Controller
                 ->limit(5)
                 ->get();
         }
+
+        // Log the report generation
+        $this->logActivity(
+            'generate_admin_report',
+            auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') generated an administrative report',
+            null,
+            'report'
+        );
 
         $pdf = PDF::loadView('admin_side.report.admin_pdf', $data);
         return $pdf->download('admin-report.pdf');

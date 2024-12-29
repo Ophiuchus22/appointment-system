@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 
 /**
  * Handles the admin dashboard functionality and calendar view
@@ -122,46 +123,32 @@ class DashboardController extends Controller
      */
     private function getRecentActivities()
     {
-        // Get appointments with their associated users, ordered by latest first
-        $activities = Appointment::with('user')
-            ->orderBy('created_at', 'desc')
-            ->orWhere('updated_at', '>', 'created_at')  // Include updated appointments
-            ->limit(10)  // Limit to 10 most recent activities
+        $activities = ActivityLog::with('causer')
+            ->latest()
+            ->limit(10)
             ->get()
-            ->map(function ($appointment) {
-                $activity = [
-                    'type' => 'appointment',
-                    // Use first_name and last_name for external appointments, user name for internal
-                    'user' => $appointment->appointment_type === 'External' 
-                        ? $appointment->first_name . ' ' . $appointment->last_name
-                        : ($appointment->user ? $appointment->user->name : 'Unknown User'),
-                    'time' => Carbon::parse(
-                        max($appointment->created_at, $appointment->updated_at)
-                    )->diffForHumans()
+            ->map(function ($log) {
+                return [
+                    'type' => $log->subject_type ?? 'system',
+                    'user' => $log->causer ? $log->causer->name : 'System',
+                    'action' => $log->description,
+                    'time' => $log->created_at->diffForHumans(),
+                    'details' => $this->getActivityDetails($log)
                 ];
-
-                // Determine the action based on timestamps and status
-                if ($appointment->created_at->eq($appointment->updated_at)) {
-                    $activity['action'] = 'created an appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
-                } else {
-                    switch ($appointment->status) {
-                        case 'confirmed':
-                            $activity['action'] = 'confirmed their appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
-                            break;
-                        case 'completed':
-                            $activity['action'] = 'completed their appointment';
-                            break;
-                        case 'cancelled':
-                            $activity['action'] = 'cancelled their appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
-                            break;
-                        default:
-                            $activity['action'] = 'updated their appointment for ' . Carbon::parse($appointment->date)->format('M d, Y');
-                    }
-                }
-
-                return $activity;
             });
 
         return $activities;
+    }
+
+    private function getActivityDetails($log)
+    {
+        if ($log->subject_type === 'appointment' && $log->subject_id) {
+            $appointment = Appointment::find($log->subject_id);
+            if ($appointment) {
+                return 'Scheduled for ' . $appointment->date->format('M d, Y') . 
+                       ' at ' . $appointment->time->format('h:i A');
+            }
+        }
+        return null;
     }
 }

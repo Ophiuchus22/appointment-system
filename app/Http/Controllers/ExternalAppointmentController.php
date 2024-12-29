@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Mail\AppointmentUpdated;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Mail;
  */
 class ExternalAppointmentController extends Controller
 {
+    use LogsActivity;
+
     /**
      * Display a listing of appointments
      * 
@@ -114,7 +117,15 @@ class ExternalAppointmentController extends Controller
                 'status' => 'pending'
             ]);
 
-            return redirect()->route('admin.appointments.index')
+            $ownerName = $this->getAppointmentOwnerName($appointment);
+            $this->logActivity(
+                'create',
+                auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') created a new appointment for ' . $ownerName,
+                $appointment->id,
+                'appointment'
+            );
+
+            return redirect()->back()
                 ->with('success', 'External appointment has been successfully created.');
 
         } catch (\Exception $e) {
@@ -154,6 +165,14 @@ class ExternalAppointmentController extends Controller
 
             $appointment->update(['status' => 'confirmed']);
 
+            $ownerName = $this->getAppointmentOwnerName($appointment);
+            $this->logActivity(
+                'confirm',
+                auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') confirmed appointment for ' . $ownerName,
+                $appointment->id,
+                'appointment'
+            );
+
             // Send confirmation email
             $email = $appointment->appointment_type === 'Internal' 
                 ? $appointment->user->email 
@@ -182,6 +201,14 @@ class ExternalAppointmentController extends Controller
 
             $appointment->update(['status' => 'cancelled']);
 
+            $ownerName = $this->getAppointmentOwnerName($appointment);
+            $this->logActivity(
+                'cancel',
+                auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') cancelled appointment for ' . $ownerName,
+                $appointment->id,
+                'appointment'
+            );
+
             // Send cancellation email
             $email = $appointment->appointment_type === 'Internal' 
                 ? $appointment->user->email 
@@ -209,6 +236,15 @@ class ExternalAppointmentController extends Controller
             }
 
             $appointment->update(['status' => 'completed']);
+
+            $ownerName = $this->getAppointmentOwnerName($appointment);
+            $this->logActivity(
+                'complete',
+                auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') marked appointment as completed for ' . $ownerName,
+                $appointment->id,
+                'appointment'
+            );
+
             return back()->with('success', 'Appointment has been marked as completed');
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while completing the appointment');
@@ -227,6 +263,15 @@ class ExternalAppointmentController extends Controller
             if (!in_array($appointment->status, ['cancelled', 'completed'])) {
                 return back()->with('error', 'Only cancelled or completed appointments can be deleted');
             }
+
+            // Log deletion before actually deleting
+            $ownerName = $this->getAppointmentOwnerName($appointment);
+            $this->logActivity(
+                'delete',
+                auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') deleted appointment for ' . $ownerName,
+                $appointment->id,
+                'appointment'
+            );
 
             $appointment->delete();
             return back()->with('success', 'Appointment has been deleted successfully');
@@ -288,6 +333,14 @@ class ExternalAppointmentController extends Controller
 
             // Update appointment
             $appointment->update($validated);
+
+            $ownerName = $this->getAppointmentOwnerName($appointment);
+            $this->logActivity(
+                'update',
+                auth()->user()->name . ' (' . ucfirst(auth()->user()->role) . ') updated appointment for ' . $ownerName,
+                $appointment->id,
+                'appointment'
+            );
 
             // Create changes array only if date or time changed
             $changes = [];
@@ -353,5 +406,12 @@ class ExternalAppointmentController extends Controller
                 'message' => 'Error fetching available times'
             ], 500);
         }
+    }
+
+    private function getAppointmentOwnerName(Appointment $appointment): string
+    {
+        return $appointment->appointment_type === 'Internal'
+            ? $appointment->user->name
+            : $appointment->first_name . ' ' . $appointment->last_name;
     }
 } 

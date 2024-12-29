@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Notification;
+use App\Models\ActivityLog;
+use App\Traits\LogsActivity;
 
 /**
  * Handles internal appointment management
@@ -22,6 +24,8 @@ use App\Models\Notification;
  */
 class InternalAppointmentController extends Controller
 {
+    use LogsActivity;
+
     /**
      * Show the appointment creation form
      * 
@@ -114,6 +118,8 @@ class InternalAppointmentController extends Controller
             $appointment->description = $validated['description'];
             $appointment->appointment_type = 'Internal';
             $appointment->save();
+
+            $this->logActivity('create', null, $appointment->id, 'appointment');
 
             // Add notification for new appointment
             Notification::create([
@@ -258,6 +264,8 @@ class InternalAppointmentController extends Controller
             }
 
             $appointment->update(['status' => 'cancelled']);
+
+            $this->logActivity('cancel', null, $appointment->id, 'appointment');
 
             // Create notification
             Notification::create([

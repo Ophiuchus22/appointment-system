@@ -8,7 +8,7 @@
         <div class="relative bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
             <!-- Modal Header -->
             <div class="flex items-center justify-between p-4 border-b border-gray-100">
-                <h3 class="text-lg font-semibold text-gray-800">Recent Activities</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Activity Logs</h3>
                 <button onclick="closeViewAllActivitiesModal()" class="text-gray-400 hover:text-gray-500">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -19,23 +19,18 @@
             <!-- Modal Body -->
             <div class="p-4 overflow-y-auto max-h-[60vh]">
                 <div class="space-y-4">
-                    @foreach($recentActivities as $activity)
+                    @forelse($recentActivities as $activity)
                         <div class="flex items-start space-x-3 pb-4 border-b border-gray-100 last:border-0">
                             <div class="mt-1">
-                                @if($activity['type'] === 'appointment')
-                                    <div class="p-2 bg-blue-50 rounded-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 011 1v3h3a1 1 0 110 2H6a1 1 0 01-1-1V8a1 1 0 011-1z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                @endif
+                                <div class="p-2 bg-blue-50 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 011 1v3h3a1 1 0 110 2H6a1 1 0 01-1-1V8a1 1 0 011-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start">
-                                    <p class="text-sm text-gray-800">
-                                        <span class="font-medium">{{ $activity['user'] }}</span> 
-                                        {{ $activity['action'] }}
-                                    </p>
+                                    <p class="text-sm text-gray-800">{{ $activity['action'] }}</p>
                                     <span class="text-xs text-gray-500">{{ $activity['time'] }}</span>
                                 </div>
                                 @if(isset($activity['details']))
@@ -43,9 +38,7 @@
                                 @endif
                             </div>
                         </div>
-                    @endforeach
-
-                    @if(count($recentActivities) === 0)
+                    @empty
                         <div class="text-center py-8">
                             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,7 +47,7 @@
                             </div>
                             <p class="text-gray-500 text-sm">No recent activities found</p>
                         </div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
 
