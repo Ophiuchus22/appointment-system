@@ -10,6 +10,7 @@ use App\Mail\AppointmentUpdated;
 use App\Mail\AppointmentConfirmed;
 use App\Mail\AppointmentCancelled;
 use Illuminate\Support\Facades\Mail;
+use App\Models\ExternalClient;
 
 /**
  * Handles external appointment management
@@ -87,6 +88,18 @@ class ExternalAppointmentController extends Controller
                 'address' => 'required|string|max:1000',
             ]);
 
+            // First, create or update the external client
+            $externalClient = ExternalClient::updateOrCreate(
+                ['email' => $validated['email']], // Find by email
+                [
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'],
+                    'phone_number' => $validated['phone_number'],
+                    'company_name' => $validated['company_name'],
+                    'address' => $validated['address'],
+                ]
+            );
+
             // Check for existing appointments
             $existingAppointment = Appointment::where('date', $validated['date'])
                 ->where('time', $validated['time'])
@@ -101,8 +114,9 @@ class ExternalAppointmentController extends Controller
             // For debugging, let's log the data before creating
             \Log::info('Attempting to create appointment with data:', $validated);
 
-            // Create the appointment
+            // Create the appointment with external_client_id
             $appointment = Appointment::create([
+                'external_client_id' => $externalClient->id, // Link to external client
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],

@@ -114,4 +114,14 @@ class Appointment extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    /**
+     * Get the external client for the appointment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function external_client()
+    {
+        return $this->belongsTo(ExternalClient::class);
+    }
 }

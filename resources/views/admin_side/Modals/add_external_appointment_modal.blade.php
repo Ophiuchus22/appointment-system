@@ -309,4 +309,79 @@ document.addEventListener('DOMContentLoaded', function() {
         dateInput.dispatchEvent(new Event('change'));
     }
 });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const firstNameInput = document.getElementById('first_name');
+    const lastNameInput = document.getElementById('last_name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone_number');
+    const companyInput = document.getElementById('company_name');
+    const addressInput = document.getElementById('address');
+    
+    // Create and style the suggestions container
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'absolute z-50 w-full bg-white shadow-lg rounded-lg border border-gray-200 mt-1 max-h-48 overflow-y-auto hidden';
+    firstNameInput.parentElement.style.position = 'relative';
+    firstNameInput.parentElement.appendChild(suggestionsContainer);
+
+    let searchTimeout;
+
+    // Add input event listener to first name field
+    firstNameInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const searchTerm = this.value;
+        
+        if (searchTerm.length < 2) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/admin/external-clients/search?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(clients => {
+                    suggestionsContainer.innerHTML = '';
+                    
+                    if (clients.length > 0) {
+                        clients.forEach(client => {
+                            const div = document.createElement('div');
+                            div.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer';
+                            div.textContent = `${client.first_name} ${client.last_name} - ${client.company_name}`;
+                            
+                            div.addEventListener('click', () => {
+                                // Fill in all fields
+                                firstNameInput.value = client.first_name;
+                                lastNameInput.value = client.last_name;
+                                emailInput.value = client.email;
+                                phoneInput.value = client.phone_number;
+                                companyInput.value = client.company_name;
+                                addressInput.value = client.address;
+                                
+                                // Hide suggestions
+                                suggestionsContainer.classList.add('hidden');
+                            });
+                            
+                            suggestionsContainer.appendChild(div);
+                        });
+                        suggestionsContainer.classList.remove('hidden');
+                    } else {
+                        suggestionsContainer.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    suggestionsContainer.classList.add('hidden');
+                });
+        }, 300);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!suggestionsContainer.contains(e.target) && e.target !== firstNameInput) {
+            suggestionsContainer.classList.add('hidden');
+        }
+    });
+});
 </script> 

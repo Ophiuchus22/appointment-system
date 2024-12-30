@@ -9,6 +9,7 @@ use App\Http\Controllers\ExternalAppointmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\ExternalClientController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -94,6 +95,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
         Route::post('/admin/reports/generate', [AdminReportController::class, 'generate'])->name('admin.reports.generate');
     });
+
+    Route::get('/admin/external-clients/search', [ExternalClientController::class, 'search'])->name('external-clients.search');
 });
 
 Route::middleware(['auth'])->prefix('admin')->group(function () {
