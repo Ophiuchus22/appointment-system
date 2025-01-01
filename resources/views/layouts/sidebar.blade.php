@@ -64,10 +64,10 @@
         <div class="sidebar-trigger absolute -right-3 top-1/2 transform -translate-y-1/2 w-3 h-12 bg-gray-700/50 rounded-r cursor-pointer hover:bg-blue-500/50 transition-colors"></div>
         <div class="flex items-center space-x-4 mb-8 p-6 border-b border-gray-700/50">
             <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <span class="text-lg font-bold">A</span>
+                <span class="text-lg font-bold">{{ substr(auth()->user()->name, 0, 1) }}</span>
             </div>
             <div>
-                <div class="text-xl font-bold">Admin Panel</div>
+                <div class="text-xl font-bold">{{ auth()->user()->name }}</div>
                 <div class="text-sm text-blue-400">Administrator</div>
             </div>
         </div>

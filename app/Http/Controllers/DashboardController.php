@@ -125,7 +125,7 @@ class DashboardController extends Controller
     {
         $activities = ActivityLog::with('causer')
             ->latest()
-            ->limit(10)
+            ->limit(30)
             ->get()
             ->map(function ($log) {
                 return [

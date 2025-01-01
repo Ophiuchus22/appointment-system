@@ -14,7 +14,7 @@
             </div>
 
             <!-- Form Content (Scrollable) -->
-            <form action="{{ route('admin.appointments.store') }}" method="POST" class="p-6">
+            <form action="{{ route('admin.appointments.store') }}" method="POST" class="p-6" autocomplete="off">
                 @csrf
                 <div class="grid grid-cols-2 gap-6">
                     <!-- Personal Information Section -->
@@ -24,7 +24,7 @@
                             <!-- First Name -->
                             <div>
                                 <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                <input type="text" name="first_name" id="first_name" required
+                                <input type="text" name="first_name" id="first_name" autocomplete="off" required
                                     class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
@@ -139,7 +139,7 @@
                                     <option value="Personal Concerns">Personal Concerns</option>
                                     <option value="Event Planning">Event Planning</option>
                                     <option value="Financial Aid">Financial Aid</option>
-                                    <option value="Graduation/Transcript Requests">Documents Request</option>
+                                    <option value="Graduation/Transcript Requests">Graduation/Transcript Requests</option>
                                     <option value="Other">Other</option>
                                 </select>
                             </div>
