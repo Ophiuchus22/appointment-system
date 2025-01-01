@@ -66,7 +66,13 @@ class ExternalAppointmentController extends Controller
                 'time' => [
                     'required',
                     'date_format:H:i',
-                    function ($attribute, $value, $fail) {
+                    function ($attribute, $value, $fail) use ($request) {
+                        $appointmentDateTime = Carbon::parse($request->date . ' ' . $value);
+                        
+                        if ($appointmentDateTime->isPast()) {
+                            $fail('Cannot schedule appointments in the past.');
+                        }
+
                         $time = Carbon::createFromFormat('H:i', $value);
                         $hour = (int) $time->format('H');
                         $minute = (int) $time->format('i');

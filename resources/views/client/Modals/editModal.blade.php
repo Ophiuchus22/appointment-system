@@ -335,6 +335,37 @@ document.getElementById('edit_date').addEventListener('change', function() {
             afternoonGroup.label = 'Afternoon (1 PM - 5 PM)';
             afternoonGroup.className = 'text-gray-900 font-medium';
 
+            const now = new Date();
+            const selectedDate = new Date(date);
+
+            const createTimeOption = (slot, isBooked) => {
+                const option = document.createElement('option');
+                option.value = slot.value;
+                option.textContent = slot.label;
+                
+                // Check if the selected datetime is in the past
+                const [hours, minutes] = slot.value.split(':');
+                const slotDateTime = new Date(selectedDate);
+                slotDateTime.setHours(parseInt(hours), parseInt(minutes), 0);
+                const isPastTime = slotDateTime <= now;
+                
+                // Don't disable the current appointment's time slot
+                const currentTime = timeSelect.getAttribute('data-current-time');
+                const isCurrentTimeSlot = slot.value === currentTime;
+                
+                option.disabled = (isBooked && !isCurrentTimeSlot) || isPastTime;
+                option.className = (option.disabled) ? 'text-gray-400' : 'text-gray-900';
+                
+                // Add a title attribute to show why the slot is disabled
+                if (isPastTime) {
+                    option.title = "This time slot has already passed";
+                } else if (isBooked && !isCurrentTimeSlot) {
+                    option.title = "This time slot is already booked";
+                }
+                
+                return option;
+            };
+
             const morningSlots = [
                 { value: '09:00', label: '9:00 AM' },
                 { value: '09:30', label: '9:30 AM' },
@@ -355,15 +386,6 @@ document.getElementById('edit_date').addEventListener('change', function() {
                 { value: '16:30', label: '4:30 PM' },
                 { value: '17:00', label: '5:00 PM' }
             ];
-
-            const createTimeOption = (slot, isBooked) => {
-                const option = document.createElement('option');
-                option.value = slot.value;
-                option.textContent = slot.label;
-                option.disabled = isBooked;
-                option.className = isBooked ? 'text-gray-400' : 'text-gray-900';
-                return option;
-            };
 
             morningSlots.forEach(slot => {
                 morningGroup.appendChild(
@@ -394,6 +416,17 @@ document.getElementById('edit_date').addEventListener('change', function() {
             loadingIndicator.classList.add('hidden');
         });
     }
+});
+
+// Add date input restriction
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+
+    const todayString = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('edit_date').setAttribute('min', todayString);
 });
 </script>
 
