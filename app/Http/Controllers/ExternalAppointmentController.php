@@ -106,9 +106,10 @@ class ExternalAppointmentController extends Controller
                 ]
             );
 
-            // Check for existing appointments
+            // Check for existing appointments - Updated to exclude completed/cancelled
             $existingAppointment = Appointment::where('date', $validated['date'])
                 ->where('time', $validated['time'])
+                ->whereNotIn('status', ['Completed', 'Cancelled'])
                 ->first();
 
             if ($existingAppointment) {
@@ -336,9 +337,11 @@ class ExternalAppointmentController extends Controller
                 'description' => 'required|string|max:1000',
             ]);
 
+            // Check for existing appointments - Updated to exclude completed/cancelled
             $existingAppointment = Appointment::where('id', '!=', $appointment->id)
                 ->where('date', $validated['date'])
                 ->where('time', $validated['time'])
+                ->whereNotIn('status', ['Completed', 'Cancelled'])
                 ->first();
 
             if ($existingAppointment) {
@@ -409,8 +412,16 @@ class ExternalAppointmentController extends Controller
     {
         try {
             $date = $request->get('date');
-            $bookedTimes = Appointment::where('date', $date)
-                ->pluck('time')
+            $excludeCompleted = $request->get('exclude_completed', false);
+
+            $query = Appointment::where('date', $date);
+            
+            // Only get appointments that are not completed or cancelled if exclude_completed is true
+            if ($excludeCompleted) {
+                $query->whereNotIn('status', ['Completed', 'Cancelled']);
+            }
+
+            $bookedTimes = $query->pluck('time')
                 ->map(function($time) {
                     return $time->format('H:i');
                 })

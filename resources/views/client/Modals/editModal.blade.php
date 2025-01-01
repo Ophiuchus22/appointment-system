@@ -308,8 +308,8 @@ document.getElementById('edit_date').addEventListener('change', function() {
         timeSelect.disabled = true;
         loadingIndicator.classList.remove('hidden');
 
-        const baseUrl = '{{ url("/") }}';
-        const url = `${baseUrl}/client/appointments/available-times?date=${date}`;
+        // Update URL to include exclude_completed parameter
+        const url = '{{ route("client.appointments.available-times") }}?date=' + date + '&exclude_completed=true';
 
         fetch(url, {
             method: 'GET',
@@ -320,10 +320,7 @@ document.getElementById('edit_date').addEventListener('change', function() {
             },
             credentials: 'same-origin'
         })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             timeSelect.innerHTML = '<option value="">Select available time</option>';
             

@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSelect.disabled = true;
             loadingIndicator.classList.remove('hidden');
             
-            const url = '{{ route("client.appointments.available-times") }}?date=' + date;
+            const url = '{{ route("client.appointments.available-times") }}?date=' + date + '&exclude_completed=true';
 
             fetch(url, {
                 method: 'GET',

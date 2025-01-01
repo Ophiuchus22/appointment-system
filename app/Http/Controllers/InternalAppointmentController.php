@@ -97,9 +97,10 @@ class InternalAppointmentController extends Controller
                 'time.date_format' => 'Please provide a valid time in 24-hour format (HH:MM).'
             ]);
             
-            // Check for existing appointments on the same date and time
+            // Check for existing appointments - Updated to exclude completed/cancelled
             $existingAppointment = Appointment::where('date', $validated['date'])
                 ->where('time', $validated['time'])
+                ->whereNotIn('status', ['Completed', 'Cancelled'])
                 ->first();
 
             if ($existingAppointment) {
@@ -204,10 +205,11 @@ class InternalAppointmentController extends Controller
                 'description' => 'required|string|max:1000'
             ]);
 
-            // Check for existing appointments on the same date and time (excluding current appointment)
+            // Check for existing appointments - Updated to exclude completed/cancelled
             $existingAppointment = Appointment::where('date', $validated['date'])
                 ->where('time', $validated['time'])
                 ->where('id', '!=', $appointment->id)
+                ->whereNotIn('status', ['Completed', 'Cancelled'])
                 ->first();
 
             if ($existingAppointment) {
@@ -292,8 +294,16 @@ class InternalAppointmentController extends Controller
     {
         try {
             $date = $request->get('date');
-            $bookedTimes = Appointment::where('date', $date)
-                ->pluck('time')
+            $excludeCompleted = $request->get('exclude_completed', false);
+
+            $query = Appointment::where('date', $date);
+            
+            // Only get appointments that are not completed or cancelled
+            if ($excludeCompleted) {
+                $query->whereNotIn('status', ['Completed', 'Cancelled']);
+            }
+
+            $bookedTimes = $query->pluck('time')
                 ->map(function($time) {
                     return $time->format('H:i');
                 })

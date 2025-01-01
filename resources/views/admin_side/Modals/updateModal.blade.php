@@ -179,7 +179,7 @@ document.getElementById('update_date').addEventListener('change', function() {
         loadingIndicator.classList.remove('hidden');
 
         const baseUrl = '{{ url("/") }}';
-        const url = `${baseUrl}/admin/appointments/available-times?date=${date}`;
+        const url = `${baseUrl}/admin/appointments/available-times?date=${date}&exclude_completed=true`;
 
         fetch(url, {
             method: 'GET',
