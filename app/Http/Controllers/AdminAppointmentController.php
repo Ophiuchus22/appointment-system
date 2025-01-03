@@ -15,23 +15,46 @@ class AdminAppointmentController extends Controller
         // Start with base query
         $query = Appointment::query();
 
-        // Filter by status if provided
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
+        // Search by name if provided
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%");
+            });
         }
 
-        // Sort by most recent first and paginate
-        $appointments = $query->latest()->paginate(10);
+        // Filter by status if provided
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by year if provided
+        if ($request->filled('year')) {
+            $query->whereYear('date', $request->year);
+        }
+
+        // Apply sorting
+        if ($request->sort === 'oldest') {
+            $query->oldest('date')->oldest('time');
+        } else {
+            $query->latest('date')->latest('time');
+        }
+
+        // Get paginated results
+        $appointments = $query->paginate(10);
 
         // Preserve filter inputs for repopulating the form
         $filters = [
-            'status' => $request->input('status'),
-            'start_date' => $request->input('start_date'),
-            'end_date' => $request->input('end_date')
+            'status' => $request->status,
+            'search' => $request->search,
+            'year' => $request->year,
+            'sort' => $request->sort ?? 'latest'
         ];
 
         return view('admin_side.appointments.index', compact('appointments', 'filters'));
     }
+
 
     public function create()
     {

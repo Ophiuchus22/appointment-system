@@ -6,6 +6,7 @@ use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NewClientController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -64,6 +65,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])
             ->name('appointments.destroy');
+            
+        Route::get('/clients', [NewClientController::class, 'index'])->name('clients.index');
+        Route::get('/clients/create', [NewClientController::class, 'create'])->name('clients.create');
+        Route::post('/clients', [NewClientController::class, 'store'])->name('clients.store');
+        Route::get('/clients/{client}/edit', [NewClientController::class, 'edit'])->name('clients.edit');
+        Route::put('/clients/{client}', [NewClientController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{client}', [NewClientController::class, 'destroy'])->name('clients.destroy');
+    
     });
     
     // Add these new routes

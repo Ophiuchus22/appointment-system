@@ -11,42 +11,98 @@
     @include('layouts.sidebar')
     <div class="container mx-auto px-4 py-8">
         <div class="bg-white shadow-md rounded-lg">
+            <!-- Header with title and new appointment button -->
             <div class="flex justify-between items-center p-6 border-b">
                 <h1 class="text-2xl font-bold text-gray-800">Appointments Management</h1>
-                <a href="{{ route('admin.appointments.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                    Create New Appointment
-                </a>
+                
+                <div class="relative">
+                    <button id="newAppointmentBtn" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                        New Appointment
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="newAppointmentDropdown" 
+                         class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
+                        <a href="{{route('admin.clients.create')}}" 
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Add New Client
+                        </a>
+                        <a href="{{ route('admin.appointments.create') }}" 
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Add Appointment
+                        </a>
+                    </div>
+                </div>
             </div>
 
+            <!-- Filters section -->
             <div class="p-6">
-                <form action="{{ route('admin.appointments.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <div class="mt-1 flex space-x-2">
-                            <button type="submit" name="status" value="pending" class="px-4 py-2 rounded-md {{ $filters['status'] == 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }}">
-                                Pending
+                <form action="{{ route('admin.appointments.index') }}" method="GET">
+                    <div class="flex flex-wrap items-end gap-4">
+                        <!-- Search Name -->
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search Name</label>
+                            <input type="text" 
+                                   name="search" 
+                                   id="search" 
+                                   placeholder="Search by name..."
+                                   value="{{ request('search') }}"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+
+                        <!-- Status -->
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select name="status" id="status" 
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">All Status</option>
+                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            </select>
+                        </div>
+
+                        <!-- Year -->
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                            <select name="year" id="year" 
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">All Years</option>
+                                @for ($i = date('Y'); $i >= date('Y') - 5; $i--)
+                                    <option value="{{ $i }}" {{ request('year') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <!-- Sort -->
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="sort" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                            <select name="sort" id="sort" 
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest First</option>
+                                <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                            </select>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-2">
+                            <button type="reset" 
+                                    onclick="window.location='{{ route('admin.appointments.index') }}'"
+                                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md text-sm font-medium transition-colors">
+                                Reset
                             </button>
-                            <button type="submit" name="status" value="confirmed" class="px-4 py-2 rounded-md {{ $filters['status'] == 'confirmed' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }}">
-                                Confirmed
-                            </button>
-                            <button type="submit" name="status" value="completed" class="px-4 py-2 rounded-md {{ $filters['status'] == 'completed' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }}">
-                                Completed
-                            </button>
-                            <button type="submit" name="status" value="cancelled" class="px-4 py-2 rounded-md {{ $filters['status'] == 'cancelled' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700' }}">
-                                Cancelled
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm font-medium transition-colors">
+                                Apply Filters
                             </button>
                         </div>
                     </div>
-                    <div class="flex justify-end items-center space-x-2">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                            Apply Filters
-                        </button>
-                        <a href="{{ route('admin.appointments.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                            Reset
-                        </a>
-                    </div>
                 </form>
             </div>
+
 
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -114,5 +170,25 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        // Toggle dropdown menu
+        const newAppointmentBtn = document.getElementById('newAppointmentBtn');
+        const newAppointmentDropdown = document.getElementById('newAppointmentDropdown');
+
+        newAppointmentBtn.addEventListener('click', () => {
+            newAppointmentDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!newAppointmentBtn.contains(e.target)) {
+                newAppointmentDropdown.classList.add('hidden');
+            }
+        });
+    </script>
+
+    
 </body>
 </html>

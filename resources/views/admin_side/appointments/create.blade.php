@@ -12,6 +12,12 @@
     <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Create New Appointment</h1>
 
+        @if(session('success'))
+            <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
+                {{ session('success') }}
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <strong class="font-bold">Oops! There were some errors:</strong>
