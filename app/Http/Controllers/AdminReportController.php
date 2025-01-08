@@ -55,35 +55,71 @@ class AdminReportController extends Controller
     public function generate(Request $request)
     {
         $reportTypes = $request->input('report_types', []);
+        $dateRange = $request->input('date_range', 'all');
+        $customStartDate = $request->input('start_date');
+        $customEndDate = $request->input('end_date');
+
+        // Calculate date range
+        $startDate = null;
+        $endDate = now();
+
+        switch ($dateRange) {
+            case 'today':
+                $startDate = now()->startOfDay();
+                break;
+            case 'week':
+                $startDate = now()->startOfWeek();
+                break;
+            case 'month':
+                $startDate = now()->startOfMonth();
+                break;
+            case 'year':
+                $startDate = now()->startOfYear();
+                break;
+            case 'custom':
+                $startDate = Carbon::parse($customStartDate)->startOfDay();
+                $endDate = Carbon::parse($customEndDate)->endOfDay();
+                break;
+        }
+
         $data = [
             'generated_at' => now()->setTimezone('Asia/Manila')->format('F j, Y g:i A'),
-            'reportTypes' => $reportTypes
+            'reportTypes' => $reportTypes,
+            'date_range' => [
+                'start' => $startDate ? $startDate->format('F j, Y') : 'All time',
+                'end' => $endDate->format('F j, Y')
+            ]
         ];
 
         // Only get appointment stats if selected
         if (in_array('appointment_overview', $reportTypes)) {
-            $data['appointmentStats'] = Appointment::select('status', DB::raw('count(*) as count'))
+            $query = Appointment::query();
+            if ($startDate) {
+                $query->whereBetween('created_at', [$startDate, $endDate]);
+            }
+            
+            $data['appointmentStats'] = $query->select('status', DB::raw('count(*) as count'))
                 ->groupBy('status')
                 ->get()
                 ->pluck('count', 'status')
                 ->toArray();
 
-            $data['collegeStats'] = User::join('appointments', 'users.id', '=', 'appointments.user_id')
-                ->select('college_office', DB::raw('count(*) as count'))
+            $collegeQuery = User::join('appointments', 'users.id', '=', 'appointments.user_id');
+            if ($startDate) {
+                $collegeQuery->whereBetween('appointments.created_at', [$startDate, $endDate]);
+            }
+            $data['collegeStats'] = $collegeQuery->select('college_office', DB::raw('count(*) as count'))
                 ->groupBy('college_office')
-                ->get();
-
-            $data['dailyStats'] = Appointment::where('created_at', '>=', Carbon::now()->subDays(30))
-                ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-                ->groupBy(DB::raw('DATE(created_at)'))
-                ->orderBy('date')
                 ->get();
         }
 
         // Only get user activity if selected
         if (in_array('user_activity', $reportTypes)) {
-            $data['frequentUsers'] = User::join('appointments', 'users.id', '=', 'appointments.user_id')
-                ->select('users.name', 'users.college_office', DB::raw('count(*) as appointment_count'))
+            $userQuery = User::join('appointments', 'users.id', '=', 'appointments.user_id');
+            if ($startDate) {
+                $userQuery->whereBetween('appointments.created_at', [$startDate, $endDate]);
+            }
+            $data['frequentUsers'] = $userQuery->select('users.name', 'users.college_office', DB::raw('count(*) as appointment_count'))
                 ->groupBy('users.id', 'users.name', 'users.college_office')
                 ->orderBy('appointment_count', 'desc')
                 ->limit(5)
@@ -92,7 +128,11 @@ class AdminReportController extends Controller
 
         // Only get purpose analysis if selected
         if (in_array('purpose_analysis', $reportTypes)) {
-            $data['commonPurposes'] = Appointment::select('purpose', DB::raw('count(*) as count'))
+            $purposeQuery = Appointment::query();
+            if ($startDate) {
+                $purposeQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+            $data['commonPurposes'] = $purposeQuery->select('purpose', DB::raw('count(*) as count'))
                 ->groupBy('purpose')
                 ->orderBy('count', 'desc')
                 ->limit(5)

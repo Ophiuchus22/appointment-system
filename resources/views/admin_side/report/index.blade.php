@@ -64,6 +64,76 @@
                                 </div>
                             </div>
 
+                            <!-- Date Range Selector -->
+                            <div class="space-y-6">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Select Date Range</h2>
+                                    
+                                    <div class="relative">
+                                        <select name="date_range" id="date_range" 
+                                                class="block w-full rounded-lg border border-gray-200 bg-white py-3 px-4 pr-10 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none">
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                            <option value="year">This Year</option>
+                                            <option value="custom">Custom Date Range</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
+                                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Date Range Inputs -->
+                                <div id="custom-range" class="space-y-4 hidden">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <!-- Start Date -->
+                                        <div class="space-y-2">
+                                            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                                            <div class="relative">
+                                                <input type="date" name="start_date" id="start_date"
+                                                       class="block w-full rounded-lg border border-gray-200 bg-white py-3 px-4 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                            </div>
+                                        </div>
+
+                                        <!-- End Date -->
+                                        <div class="space-y-2">
+                                            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
+                                            <div class="relative">
+                                                <input type="date" name="end_date" id="end_date"
+                                                       class="block w-full rounded-lg border border-gray-200 bg-white py-3 px-4 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const dateRange = document.getElementById('date_range');
+                                const customRange = document.getElementById('custom-range');
+                                
+                                dateRange.addEventListener('change', function() {
+                                    if (this.value === 'custom') {
+                                        customRange.classList.remove('hidden');
+                                        customRange.style.opacity = '0';
+                                        setTimeout(() => {
+                                            customRange.style.transition = 'opacity 0.3s ease-in-out';
+                                            customRange.style.opacity = '1';
+                                        }, 10);
+                                    } else {
+                                        customRange.style.opacity = '0';
+                                        setTimeout(() => {
+                                            customRange.classList.add('hidden');
+                                        }, 300);
+                                    }
+                                });
+                            });
+                            </script>
+
                             <!-- Action Buttons -->
                             <div class="flex justify-end pt-4 border-t border-gray-100">
                                 <button type="submit" 

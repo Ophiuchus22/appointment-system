@@ -72,8 +72,7 @@
             </div>
             <div>
                 <div class="text-xl font-bold">
-                    <span class="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Acad</span>
-                    <span class="text-white">Point</span>
+                    <span class="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Acad</span><span class="text-white">Point</span>
                 </div>
                 <div class="text-sm text-blue-400">Administrator</div>
             </div>

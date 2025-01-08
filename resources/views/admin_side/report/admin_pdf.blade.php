@@ -50,6 +50,7 @@
     <div class="header">
         <h1>Administrative Report</h1>
         <p>Generated on: {{ $generated_at }}</p>
+        <p>Report Period: {{ $date_range['start'] }} to {{ $date_range['end'] }}</p>
     </div>
 
     @if(in_array('appointment_overview', $reportTypes))
