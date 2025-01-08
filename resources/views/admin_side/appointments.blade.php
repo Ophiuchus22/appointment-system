@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
 </head>
 <body class="bg-gray-100">
     <!-- Add this right after your body tag starts -->
@@ -37,7 +39,17 @@
                             <h1 class="text-2xl font-bold text-gray-800">Appointments Management</h1>
                             <p class="text-sm text-gray-500 mt-1">View and manage all appointments</p>
                         </div>
-                        <div>
+                        <div class="flex space-x-3">
+                            <button id="startTour" 
+                                class="group relative inline-flex items-center px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 border border-blue-200 rounded-lg hover:from-blue-100 hover:to-indigo-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm">
+                                <span class="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 rounded-lg transition-all duration-200"></span>
+                                <svg class="w-5 h-5 mr-2 text-blue-500 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3c-3.75 0-6.75 2.25-6.75 6.75 0 1.875.75 3.375 1.875 4.5L8.25 21h7.5l1.125-6.75c1.125-1.125 1.875-2.625 1.875-4.5C18.75 5.25 15.75 3 12 3z"/>
+                                </svg>
+                                <span class="relative">Help Guide</span>
+                                <!-- Notification dot for first-time users -->
+                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 rounded-full ring-2 ring-white animate-pulse" id="helpNotificationDot"></span>
+                            </button>
                             <button onclick="openModal('addExternalAppointmentModal')" 
                                 class="inline-flex items-center px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -658,6 +670,475 @@
         function hideLoading() {
             document.getElementById('loadingOverlay').classList.add('hidden');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tour = new Shepherd.Tour({
+                useModalOverlay: true,
+                defaultStepOptions: {
+                    classes: 'shadow-xl bg-white rounded-xl border border-gray-100',
+                    scrollTo: { behavior: 'smooth', block: 'center' },
+                    cancelIcon: {
+                        enabled: true
+                    },
+                    when: {
+                        show() {
+                            const currentStep = tour.getCurrentStep();
+                            const target = currentStep.getTarget();
+                            if (target) {
+                                target.classList.add('shepherd-highlight');
+                            }
+                        },
+                        hide() {
+                            const currentStep = tour.getCurrentStep();
+                            const target = currentStep.getTarget();
+                            if (target) {
+                                target.classList.remove('shepherd-highlight');
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Enhanced welcome step with animation
+            tour.addStep({
+                id: 'welcome',
+                text: `
+                    <div class="text-gray-800 animate-fade-in">
+                        <h3 class="text-xl font-semibold mb-3 text-blue-600">Welcome to AcadPoint! 👋</h3>
+                        <p class="mb-4">Let's take a tour of your appointment management dashboard. We'll cover everything you need to know to get started.</p>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-sm text-blue-600">💡 Tip: You can restart this tour anytime by clicking the Help Guide button.</p>
+                        </div>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Skip Tour',
+                        action: tour.complete,
+                        classes: 'shepherd-button-secondary'
+                    },
+                    {
+                        text: 'Start Tour',
+                        action: tour.next,
+                        classes: 'shepherd-button-primary pulse-animation'
+                    }
+                ]
+            });
+
+            // 
+            tour.addStep({
+                id: 'add-appointment',
+                attachTo: {
+                    element: 'button[onclick="openModal(\'addExternalAppointmentModal\')"]',
+                    on: 'bottom'
+                },
+                text: `
+                    <div class="text-gray-800">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Creating New Appointments</h3>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium mb-2">Quick Guide:</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                        <span>Click "Add Appointment" to create a new appointment</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        <span>Fill in visitor's personal information</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span>Select available date and time slot</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-sm text-blue-600">
+                                    💡 Tip: The system will automatically check for scheduling conflicts and validate all information.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Back',
+                        action: tour.back,
+                        classes: 'shepherd-button-secondary'
+                    },
+                    {
+                        text: 'Next',
+                        action: tour.next,
+                        classes: 'shepherd-button-primary'
+                    }
+                ]
+            });
+
+            // Enhanced filters step with interactive elements
+            tour.addStep({
+                id: 'filters',
+                attachTo: {
+                    element: '.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5',
+                    on: 'bottom'
+                },
+                text: `
+                    <div class="text-gray-800">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Smart Filtering System</h3>
+                        <p class="mb-3">Quickly find appointments using our powerful filters:</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center space-x-2 filter-demo" onclick="demonstrateFilter('status')">
+                                <span class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm">Status Filter - Track appointment progress</span>
+                            </div>
+                            <div class="flex items-center space-x-2 filter-demo" onclick="demonstrateFilter('date')">
+                                <span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm">Date Range - Find appointments by time period</span>
+                            </div>
+                            <div class="flex items-center space-x-2 filter-demo" onclick="demonstrateFilter('search')">
+                                <span class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm">Quick Search - Find appointments by name or details</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500">👆 Click any filter type to see it in action!</p>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Back',
+                        action: tour.back,
+                        classes: 'shepherd-button-secondary'
+                    },
+                    {
+                        text: 'Next',
+                        action: tour.next,
+                        classes: 'shepherd-button-primary'
+                    }
+                ]
+            });
+
+            // New step for status management
+            tour.addStep({
+                id: 'status-management',
+                attachTo: {
+                    element: 'table thead tr th:nth-child(6)',
+                    on: 'bottom'
+                },
+                text: `
+                    <div class="text-gray-800">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Appointment Status Management</h3>
+                        <div class="space-y-3 mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>
+                                <span class="text-sm">New appointments awaiting confirmation</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Confirmed</span>
+                                <span class="text-sm">Approved and scheduled appointments</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Completed</span>
+                                <span class="text-sm">Successfully finished appointments</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Cancelled</span>
+                                <span class="text-sm">Cancelled or declined appointments</span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Back',
+                        action: tour.back,
+                        classes: 'shepherd-button-secondary'
+                    },
+                    {
+                        text: 'Next',
+                        action: tour.next,
+                        classes: 'shepherd-button-primary'
+                    }
+                ]
+            });
+
+            // New step for quick actions
+            tour.addStep({
+                id: 'quick-actions',
+                attachTo: {
+                    element: 'table tbody tr:first-child td:last-child',
+                    on: 'left'
+                },
+                text: `
+                    <div class="text-gray-800">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Quick Actions</h3>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium mb-2">Available Actions:</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        <span>View full appointment details</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        <span>Update appointment details</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        <span>Cancel or delete appointments</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p>💡 Tip: Hover over any action button to see what it does!</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Back',
+                        action: tour.back,
+                        classes: 'shepherd-button-secondary'
+                    },
+                    {
+                        text: 'Next',
+                        action: tour.next,
+                        classes: 'shepherd-button-primary'
+                    }
+                ]
+            });
+
+            // New step for notifications and alerts
+            tour.addStep({
+                id: 'notifications',
+                text: `
+                    <div class="text-gray-800">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Notifications & Alerts</h3>
+                        <div class="space-y-4">
+                            <p class="text-sm">Stay informed about appointment updates:</p>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-green-50 text-green-700 rounded-lg text-sm">
+                                    ✓ Success notifications appear here
+                                </div>
+                                <div class="p-3 bg-yellow-50 text-yellow-700 rounded-lg text-sm">
+                                    ⚠ Warning alerts for important changes
+                                </div>
+                                <div class="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                                    ⚠ Error messages when something goes wrong
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Notifications will automatically disappear after a few seconds.
+                            </p>
+                        </div>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Back',
+                        action: tour.back,
+                        classes: 'shepherd-button-secondary'
+                    },
+                    {
+                        text: 'Next',
+                        action: tour.next,
+                        classes: 'shepherd-button-primary'
+                    }
+                ]
+            });
+
+            // Final step with helpful resources
+            tour.addStep({
+                id: 'completion',
+                text: `
+                    <div class="text-gray-800">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">You're All Set! 🎉</h3>
+                        <div class="space-y-4">
+                            <p>You now know the basics of managing appointments. Here are some helpful tips:</p>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <p class="text-sm">📅 Regular check appointments daily</p>
+                                <p class="text-sm">📧 Keep communication channels open</p>
+                                <p class="text-sm">⚡ Use quick actions for efficiency</p>
+                                <p class="text-sm">🔍 Utilize filters for better organization</p>
+                            </div>
+                            <div class="mt-4 text-sm text-gray-600">
+                                Need help? Click the Help Guide button anytime to restart this tour.
+                            </div>
+                        </div>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Finish Tour',
+                        action: tour.complete,
+                        classes: 'shepherd-button-primary'
+                    }
+                ]
+            });
+
+            // Start tour button handler
+            document.getElementById('startTour').addEventListener('click', () => {
+                tour.start();
+            });
+
+            // Show tour on first visit
+            if (!localStorage.getItem('appointmentTourShown')) {
+                tour.start();
+                localStorage.setItem('appointmentTourShown', 'true');
+            }
+        });
+
+        // Function to demonstrate filters
+        function demonstrateFilter(filterType) {
+            const filterInputs = {
+                'status': document.getElementById('status-filter'),
+                'date': document.getElementById('date-filter'),
+                'search': document.getElementById('search')
+            };
+
+            const input = filterInputs[filterType];
+            if (input) {
+                input.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+                input.focus();
+                setTimeout(() => {
+                    input.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+                }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationDot = document.getElementById('helpNotificationDot');
+            
+            // Hide dot if tour has been shown before
+            if (localStorage.getItem('appointmentTourShown')) {
+                notificationDot.classList.add('hidden');
+            }
+
+            // Hide dot after starting tour
+            document.getElementById('startTour').addEventListener('click', () => {
+                notificationDot.classList.add('hidden');
+            });
+        });
     </script>
+
+    <!-- Add these new styles -->
+    <style>
+    /* Tour Styles */
+    .shepherd-highlight {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+        transition: box-shadow 0.2s ease-in-out;
+    }
+
+    .shepherd-button {
+        @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+    }
+
+    .shepherd-button-primary {
+        @apply bg-blue-600 text-white hover:bg-blue-700;
+    }
+
+    .shepherd-button-secondary {
+        @apply bg-gray-500 text-white hover:bg-gray-600;
+    }
+
+    .shepherd-text {
+        @apply p-4;
+    }
+
+    .shepherd-footer {
+        @apply p-4 flex justify-end space-x-2 border-t border-gray-100;
+    }
+
+    .shepherd-cancel-icon {
+        @apply text-gray-400 hover:text-gray-600 transition-colors duration-200;
+    }
+
+    .filter-demo {
+        @apply p-2 rounded-lg transition-all duration-200 cursor-pointer hover:bg-gray-50;
+    }
+
+    /* Animations */
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes gradient-shift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    #startTour {
+        background-size: 200% 200%;
+        animation: gradient-shift 4s ease infinite;
+    }
+
+    #startTour:hover {
+        transform: translateY(-1px);
+    }
+
+    #startTour:active {
+        transform: translateY(0px);
+    }
+    </style>
 </body>
 </html> 

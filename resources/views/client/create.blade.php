@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment Form</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
     <style>
         .tab-indicator {
             transition: transform 0.3s ease;
@@ -191,7 +192,7 @@
                 <div class="section" id="details-section">
                     <div class="space-y-6">
                         <!-- Phone Number - Single Column -->
-                        <div class="max-w-md">
+                        <div class="max-w-md" id="contact-section">
                             <label class="block text-sm font-medium text-gray-600">Phone Number</label>
                             <div class="mt-1 relative rounded-md shadow-sm">
                                 <input type="tel" 
@@ -202,7 +203,7 @@
                         </div>
 
                         <!-- Date and Time - Two Columns -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="datetime-section">
                             <div>
                                 <label for="date" class="block text-sm font-medium text-gray-600">Date</label>
                                 <div class="mt-1 relative rounded-md shadow-sm">
@@ -260,7 +261,7 @@
                         </div>
 
                         <!-- Purpose - Single Column -->
-                        <div>
+                        <div id="purpose-section">
                             <label class="block text-sm font-medium text-gray-600">Purpose</label>
                             <div class="mt-1 relative rounded-md shadow-sm">
                                 <select name="purpose" 
@@ -353,6 +354,61 @@
         </div>
     </div>
 </div>
+
+<button id="startTour" 
+    class="fixed bottom-6 right-6 group inline-flex items-center px-5 py-3 text-sm font-medium 
+    bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 
+    text-blue-600 
+    border border-blue-100/80 
+    rounded-xl
+    hover:from-blue-100 hover:via-indigo-100 hover:to-purple-100
+    hover:border-blue-200 
+    hover:shadow-lg hover:shadow-blue-500/10
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
+    transform hover:-translate-y-0.5 active:translate-y-0
+    transition-all duration-200 
+    backdrop-blur-sm 
+    z-50">
+    <!-- Gradient overlay for hover effect -->
+    <span class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-indigo-500/0 to-purple-500/0 
+        group-hover:from-blue-500/5 group-hover:via-indigo-500/5 group-hover:to-purple-500/5 
+        rounded-xl transition-all duration-200">
+    </span>
+    
+    <!-- Light effect -->
+    <span class="absolute inset-0 rounded-xl bg-gradient-to-tr from-white/20 via-white/0 to-white/0"></span>
+    
+    <!-- Glow effect -->
+    <span class="absolute inset-0 rounded-xl ring-1 ring-inset ring-black/5"></span>
+    
+    <!-- Icon with enhanced styling -->
+    <svg class="w-5 h-5 mr-2.5 text-blue-500 group-hover:text-blue-600 transition-colors duration-200 
+        filter drop-shadow-sm" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M9.663 17h4.673M12 3c-3.75 0-6.75 2.25-6.75 6.75 0 1.875.75 3.375 1.875 4.5L8.25 21h7.5l1.125-6.75c1.125-1.125 1.875-2.625 1.875-4.5C18.75 5.25 15.75 3 12 3z"/>
+    </svg>
+    
+    <!-- Text with enhanced styling -->
+    <span class="relative font-semibold tracking-wide">Help Guide</span>
+    
+    <!-- Enhanced notification dot -->
+    <span class="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 
+        bg-gradient-to-r from-blue-500 to-indigo-500 
+        rounded-full ring-2 ring-white 
+        animate-pulse 
+        shadow-lg shadow-blue-500/50" 
+        id="helpNotificationDot">
+        <!-- Inner glow -->
+        <span class="absolute inset-0 rounded-full bg-white/40"></span>
+    </span>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -592,6 +648,334 @@ document.addEventListener('DOMContentLoaded', function() {
         dateInput.dispatchEvent(new Event('change'));
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tour = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+            classes: 'shadow-xl bg-white rounded-xl border border-gray-100',
+            scrollTo: { behavior: 'smooth', block: 'center' },
+            cancelIcon: {
+                enabled: true
+            }
+        }
+    });
+
+    // Welcome step
+    tour.addStep({
+        id: 'welcome',
+        text: `
+            <div class="text-gray-800">
+                <h3 class="text-xl font-semibold mb-3 text-blue-600">Welcome to Appointment Creation! 👋</h3>
+                <p class="mb-4">This guide will help you understand how to schedule your appointment properly.</p>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-blue-600">💡 Tip: Follow each step carefully to ensure your appointment is scheduled successfully.</p>
+                </div>
+            </div>
+        `,
+        buttons: [
+            {
+                text: 'Skip Tour',
+                action: tour.complete,
+                classes: 'shepherd-button-secondary'
+            },
+            {
+                text: 'Start Tour',
+                action: tour.next,
+                classes: 'shepherd-button-primary'
+            }
+        ]
+    });
+
+    // Contact Information step
+    tour.addStep({
+        id: 'contact-info',
+        attachTo: {
+            element: '#contact-section',
+            on: 'bottom'
+        },
+        text: `
+            <div class="text-gray-800">
+                <h3 class="text-lg font-semibold mb-3 text-blue-600">Contact Information</h3>
+                <div class="space-y-4">
+                    <p class="text-sm">Provide your contact details:</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <span>Phone number should be 11 digits</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        buttons: [
+            {
+                text: 'Back',
+                action: tour.back,
+                classes: 'shepherd-button-secondary'
+            },
+            {
+                text: 'Next',
+                action: tour.next,
+                classes: 'shepherd-button-primary'
+            }
+        ]
+    });
+
+    // Date and Time Selection step
+    tour.addStep({
+        id: 'datetime',
+        attachTo: {
+            element: '#datetime-section',
+            on: 'bottom'
+        },
+        text: `
+            <div class="text-gray-800">
+                <h3 class="text-lg font-semibold mb-3 text-blue-600">Schedule Your Appointment</h3>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-medium mb-2">Available Hours:</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                <span>Morning: 9:00 AM - 12:00 PM</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                                </svg>
+                                <span>Afternoon: 1:00 PM - 5:00 PM</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <p class="text-sm text-blue-600">
+                            💡 Tip: The system will automatically check for scheduling conflicts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `,
+        buttons: [
+            {
+                text: 'Back',
+                action: tour.back,
+                classes: 'shepherd-button-secondary'
+            },
+            {
+                text: 'Next',
+                action: tour.next,
+                classes: 'shepherd-button-primary'
+            }
+        ]
+    });
+
+    // Purpose and Description step
+    tour.addStep({
+        id: 'purpose',
+        attachTo: {
+            element: '#purpose-section',
+            on: 'bottom'
+        },
+        text: `
+            <div class="text-gray-800">
+                <h3 class="text-lg font-semibold mb-3 text-blue-600">Appointment Details</h3>
+                <div class="space-y-4">
+                    <p class="text-sm">Provide clear and concise information:</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            <span>State your main purpose clearly</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                            </svg>
+                            <span>Add relevant details in the description</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        buttons: [
+            {
+                text: 'Back',
+                action: tour.back,
+                classes: 'shepherd-button-secondary'
+            },
+            {
+                text: 'Next',
+                action: tour.next,
+                classes: 'shepherd-button-primary'
+            }
+        ]
+    });
+
+    // Final step
+    tour.addStep({
+        id: 'completion',
+        text: `
+            <div class="text-gray-800">
+                <h3 class="text-lg font-semibold mb-3 text-blue-600">Ready to Schedule! 🎉</h3>
+                <div class="space-y-4">
+                    <p>Before submitting, make sure:</p>
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                        <p class="text-sm">📱 Your contact information is correct</p>
+                        <p class="text-sm">📅 You've selected an available time slot</p>
+                        <p class="text-sm">📝 Your purpose is clearly stated</p>
+                        <p class="text-sm">📋 All required fields are filled</p>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        Need help? Click the Help Guide button anytime to restart this tour.
+                    </div>
+                </div>
+            </div>
+        `,
+        buttons: [
+            {
+                text: 'Finish Tour',
+                action: tour.complete,
+                classes: 'shepherd-button-primary'
+            }
+        ]
+    });
+
+    // Start tour button handler
+    document.getElementById('startTour').addEventListener('click', () => {
+        tour.start();
+    });
+
+    // Show tour on first visit
+    if (!localStorage.getItem('createAppointmentTourShown')) {
+        tour.start();
+        localStorage.setItem('createAppointmentTourShown', 'true');
+    }
+
+    // Handle notification dot visibility
+    const notificationDot = document.getElementById('helpNotificationDot');
+    if (localStorage.getItem('createAppointmentTourShown')) {
+        notificationDot.classList.add('hidden');
+    }
+
+    // Hide dot after starting tour
+    document.getElementById('startTour').addEventListener('click', () => {
+        notificationDot.classList.add('hidden');
+    });
+});
 </script>
+
+<!-- Add the tour styles -->
+<style>
+/* Tour Styles */
+.shepherd-highlight {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.shepherd-button {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+}
+
+.shepherd-button-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.shepherd-button-secondary {
+    @apply bg-gray-500 text-white hover:bg-gray-600;
+}
+
+.shepherd-text {
+    @apply p-4;
+}
+
+.shepherd-footer {
+    @apply p-4 flex justify-end space-x-2 border-t border-gray-100;
+}
+
+.shepherd-cancel-icon {
+    @apply text-gray-400 hover:text-gray-600 transition-colors duration-200;
+}
+
+/* Help button animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+#startTour {
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+}
+
+#startTour:hover {
+    transform: translateY(-1px);
+}
+
+#startTour:active {
+    transform: translateY(0px);
+}
+
+/* Additional animations for the help guide button */
+@keyframes gentle-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+#startTour {
+    animation: float 6s ease-in-out infinite;
+}
+
+#helpNotificationDot {
+    animation: gentle-pulse 2s infinite;
+}
+
+/* Glass effect for modern browsers */
+@@supports (backdrop-filter: blur(12px)) {
+    #startTour {
+        backdrop-filter: blur(12px);
+        background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+    }
+}
+
+/* Improved hover state */
+#startTour:hover {
+    box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.1),
+                0 4px 12px -2px rgba(59, 130, 246, 0.08);
+}
+
+/* Active state enhancement */
+#startTour:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.06);
+}
+</style>
 </body>
 </html>

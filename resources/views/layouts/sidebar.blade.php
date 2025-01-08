@@ -63,11 +63,18 @@
     <div id="sidebar" class="sidebar bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white w-64 min-h-screen shadow-lg">
         <div class="sidebar-trigger absolute -right-3 top-1/2 transform -translate-y-1/2 w-3 h-12 bg-gray-700/50 rounded-r cursor-pointer hover:bg-blue-500/50 transition-colors"></div>
         <div class="flex items-center space-x-4 mb-8 p-6 border-b border-gray-700/50">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <span class="text-lg font-bold">{{ substr(auth()->user()->name, 0, 1) }}</span>
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/>
+                </svg>
             </div>
             <div>
-                <div class="text-xl font-bold">{{ auth()->user()->name }}</div>
+                <div class="text-xl font-bold">
+                    <span class="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Acad</span>
+                    <span class="text-white">Point</span>
+                </div>
                 <div class="text-sm text-blue-400">Administrator</div>
             </div>
         </div>
@@ -327,7 +334,7 @@
 
                 // Only set up interval if we're not on a page with messages
                 if (!hasSuccessMessage && !hasErrorMessage) {
-                    const notificationInterval = setInterval(fetchNotifications, 3000);
+                    const notificationInterval = setInterval(fetchNotifications, 5000);
 
                     // Clean up interval when page is unloaded
                     window.addEventListener('beforeunload', () => {
