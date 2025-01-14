@@ -47,7 +47,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            background: url('{{ asset('logo/building.jpg') }}') center/cover;
             opacity: 0.2;
         }
 
@@ -224,6 +224,27 @@
             font-size: 0.875rem;
             margin-top: 0.25rem;
         }
+
+        .form-floating {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--light-text);
+            z-index: 10;
+            padding: 0.25rem;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -237,9 +258,6 @@
         <div class="login-form">
             <div class="form-wrapper">
                 <div class="brand-section">
-                    <div class="brand-icon">
-                        <i class="bi bi-building"></i>
-                    </div>
                     <h3>Welcome Back</h3>
                     <p class="subtitle">Please sign in to your account</p>
                 </div>
@@ -285,6 +303,9 @@
                                name="password" 
                                placeholder="Password"
                                required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                        </button>
                         <label for="password">{{ __('Password') }}</label>
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
@@ -298,5 +319,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        }
+    </script>
 </body>
 </html>

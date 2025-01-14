@@ -16,8 +16,8 @@ Please be reminded to arrive at least 15 minutes before your scheduled appointme
 
 For inquiries, you may contact us through:
 
-Email: academic.affairs@example.com <br>
-Contact No.: (123) 456-7890
+Email: acad@rmmc.edu.ph <br>
+Contact No.: 0963-835-4416
 
 Best regards,
 

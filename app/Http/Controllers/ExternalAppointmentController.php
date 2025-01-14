@@ -167,7 +167,9 @@ class ExternalAppointmentController extends Controller
      */
     public function show($id)
     {
-        $appointment = Appointment::with('user')->findOrFail($id);
+        $appointment = Appointment::with(['user' => function($query) {
+            $query->select('id', 'name', 'email', 'college_office');
+        }])->findOrFail($id);
         return response()->json($appointment);
     }
 

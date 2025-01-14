@@ -45,6 +45,10 @@
                                 <p class="font-medium text-gray-900" id="appointmentCompany"></p>
                             </div>
                             <div class="col-span-2">
+                                <p class="text-sm text-gray-500">College/Office</p>
+                                <p class="font-medium text-gray-900" id="appointmentCollege"></p>
+                            </div>
+                            <div class="col-span-2">
                                 <p class="text-sm text-gray-500">Address</p>
                                 <p class="font-medium text-gray-900" id="appointmentAddress"></p>
                             </div>
@@ -91,7 +95,6 @@
 
 <script>
 function viewAppointmentDetails(appointmentId) {
-    // Fetch appointment details from the server
     fetch(`/admin/appointments/${appointmentId}`)
         .then(response => response.json())
         .then(appointment => {
@@ -131,6 +134,9 @@ function viewAppointmentDetails(appointmentId) {
             document.getElementById('appointmentEmail').textContent = appointment.email || appointment.user.email;
             document.getElementById('appointmentPhone').textContent = appointment.phone_number;
             document.getElementById('appointmentCompany').textContent = appointment.company_name || 'N/A';
+            document.getElementById('appointmentCollege').textContent = appointment.appointment_type === 'Internal' 
+                ? (appointment.user?.college_office || 'N/A')
+                : (appointment.college_name || 'N/A');
             document.getElementById('appointmentAddress').textContent = appointment.address || 'N/A';
             document.getElementById('appointmentDate').textContent = moment(appointment.date).format('MMMM D, YYYY');
 
@@ -138,7 +144,7 @@ function viewAppointmentDetails(appointmentId) {
             const timeOnly = appointment.time.split(' ')[1];
             const [hours, minutes] = timeOnly.split(':');
             const ampm = hours >= 12 ? 'PM' : 'AM';
-            const hours12 = hours % 12 || 12; // Convert to 12-hour format
+            const hours12 = hours % 12 || 12;
             const formattedTime = `${hours12}:${minutes} ${ampm}`;
             document.getElementById('appointmentTime').textContent = formattedTime;
             document.getElementById('appointmentPurpose').textContent = appointment.purpose;

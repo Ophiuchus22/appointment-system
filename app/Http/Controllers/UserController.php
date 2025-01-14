@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Handles user management operations
@@ -26,7 +27,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::select(['id', 'name', 'email', 'role', 'college_office', 'created_at'])
+                     ->orderBy('created_at', 'desc')
+                     ->paginate(20);
+                     
         return view('admin_side.users', compact('users'));
     }
 
@@ -53,7 +57,7 @@ class UserController extends Controller
 
         // Add college_office validation only if role is user
         if ($request->input('role') === 'user') {
-            $rules['college_office'] = 'required|string|in:COLLEGE OF ARTS AND SCIENCES,COLLEGE OF BUSINESS EDUCATION,COLLEGE OF CRIMINAL JUSTICE,COLLEGE OF ENGINEERING AND TECHNOLOGY,COLLEGE OF TEACHER EDUCATION,COLLEGE OF ALLIED HEALTH SCIENCES,FINANCE OFFICE,CASHIER\'S OFFICE,REGISTRAR\'S OFFICE,GUIDANCE OFFICE,SSC OFFICE';
+            $rules['college_office'] = 'required|string|max:255';
         }
 
         $validatedData = $request->validate($rules);
@@ -68,7 +72,7 @@ class UserController extends Controller
 
         // Only add college_office if role is user
         if ($validatedData['role'] === 'user') {
-            $userData['college_office'] = $validatedData['college_office'];
+            $userData['college_office'] = strtoupper($validatedData['college_office']);
         }
 
         User::create($userData);

@@ -21,8 +21,8 @@ Description: {{ $appointment->description }}
 
 For inquiries, you may contact us through:
 
-Email: academic.affairs@example.com <br>
-Contact No.: (123) 456-7890
+Email: acad@rmmc.edu.ph <br>
+Contact No.: 0963-835-4416
 
 Best regards,
 

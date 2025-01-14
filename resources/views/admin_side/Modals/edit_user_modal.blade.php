@@ -1,8 +1,8 @@
 <!-- resources/views/admin_side/Modals/edit_user_modal.blade.php -->
 <div id="editUserModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all">
-            <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center justify-center min-h-screen p-2">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-800">Edit User</h2>
                 <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,11 +16,11 @@
                 @method('PUT')
                 <input type="hidden" name="role" value="user">
                 
-                <div class="space-y-5">
+                <div class="space-y-4">
                     <div class="relative">
-                        <label class="text-gray-700 text-sm font-medium mb-1 block">Name</label>
+                        <label class="text-gray-700 text-sm font-medium mb-0.5 block">Name</label>
                         <input type="text" name="name" id="edit_user_name" 
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
                     </div>
 
                     <div class="relative">
@@ -69,7 +69,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 mt-8">
+                <div class="flex justify-end space-x-3 mt-6">
                     <button type="button" onclick="closeEditModal()" 
                         class="px-5 py-2.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium transition-all">
                         Cancel
