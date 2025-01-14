@@ -346,6 +346,19 @@ class InternalAppointmentController extends Controller
                 ], 400);
             }
 
+            // Check for cooldown
+            $latestReminder = $appointment->notifications()
+                ->where('type', 'manual_reminder')
+                ->latest()
+                ->first();
+
+            if ($latestReminder && $latestReminder->created_at->addMinutes(30)->isFuture()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please wait ' . $latestReminder->created_at->addMinutes(30)->diffForHumans() . ' before sending another reminder.'
+                ], 429);
+            }
+
             // Create new reminder notification
             Notification::create([
                 'appointment_id' => $appointment->id,
