@@ -54,7 +54,9 @@
     <div class="max-w-7xl mx-auto flex justify-between items-center">
         <!-- Left side - Logo or Title -->
         <div>
-            <h1 class="text-xl font-semibold text-gray-800">Appointment System</h1>
+            <h1 class="text-2xl font-bold tracking-tight">
+                <span class="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent drop-shadow-sm">Appoint</span><span class="text-gray-800">Ease</span>
+            </h1>
         </div>
 
         <!-- Right side - Dropdown Menu -->
@@ -115,25 +117,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- College Logo -->
-<div class="fixed bottom-4 right-4 opacity-60">
-    @php
-        $college = Auth::user()->college ?? 'default';
-        $logos = [
-            'COLLEGE OF TEACHER EDUCATION' => 'cte.png',
-            'COLLEGE OF CRIMINAL JUSTICE' => 'ccj.png',
-            'COLLEGE OF BUSINESS EDUCATION' => 'cbe.png',
-            'COLLEGE OF ARTS AND SCIENCES' => 'cas.png',
-        ];
-        $logoFile = $logos[$college] ?? 'default.png';
-        $logoPath = public_path('logo/' . $logoFile);
-    @endphp
-    
-    @if(file_exists($logoPath))
-        <img src="{{ asset('logo/' . $logoFile) }}" alt="College Logo" class="w-32 h-32">
-    @endif
 </div>
 
 <div id="toast" class="fixed right-0 top-4 transform translate-x-full transition-transform duration-300 ease-in-out z-50">
