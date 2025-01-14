@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment Form</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo/system-logo.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
     <style>
@@ -53,7 +54,8 @@
 <div class="w-full bg-white border-b border-gray-100 px-4 py-3">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
         <!-- Left side - Logo or Title -->
-        <div>
+        <div class="flex items-center gap-2">
+            <img src="{{ asset('logo/system-logo-client.png') }}" alt="AppointEase Logo" class="h-10 w-10">
             <h1 class="text-2xl font-bold tracking-tight">
                 <span class="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent drop-shadow-sm">Appoint</span><span class="text-gray-800">Ease</span>
             </h1>
@@ -287,47 +289,47 @@
                 <div class="section hidden" id="summary-section">
                     <div class="space-y-6">
                         <!-- Summary Card -->
-                        <div class="bg-gray-50 rounded-lg p-6 space-y-4 border border-gray-100">
+                        <div class="bg-gray-50 rounded-lg p-4 sm:p-6 space-y-4 border border-gray-100">
                             <!-- Phone Number -->
-                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-baseline">
                                 <p class="text-sm font-medium text-gray-500">Phone Number</p>
-                                <p class="col-span-2 text-base text-gray-900" id="summary-phone">
+                                <p class="sm:col-span-2 text-base text-gray-900" id="summary-phone">
                                     <span class="text-gray-400 italic text-sm">Not provided</span>
                                 </p>
                             </div>
 
                             <!-- Date & Time -->
-                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-baseline">
                                 <p class="text-sm font-medium text-gray-500">Schedule</p>
-                                <div class="col-span-2 flex gap-2 text-base text-gray-900">
+                                <div class="sm:col-span-2 flex flex-wrap gap-2 text-base text-gray-900">
                                     <span id="summary-date"></span>
-                                    <span class="text-gray-400">|</span>
+                                    <span class="text-gray-400 hidden sm:inline">|</span>
                                     <span id="summary-time"></span>
                                 </div>
                             </div>
 
                             <!-- Purpose -->
-                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-baseline">
                                 <p class="text-sm font-medium text-gray-500">Purpose</p>
-                                <p class="col-span-2 text-base text-gray-900" id="summary-purpose"></p>
+                                <p class="sm:col-span-2 text-base text-gray-900" id="summary-purpose"></p>
                             </div>
 
                             <!-- Description -->
-                            <div class="grid grid-cols-3 gap-4 items-baseline">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-baseline">
                                 <p class="text-sm font-medium text-gray-500">Description</p>
-                                <p class="col-span-2 text-base text-gray-900 whitespace-pre-line" id="summary-description"></p>
+                                <p class="sm:col-span-2 text-base text-gray-900 whitespace-pre-line" id="summary-description"></p>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex justify-between items-center pt-4">
+                        <div class="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between items-stretch sm:items-center pt-4">
                             <button type="button" 
-                                class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all duration-200 font-medium" 
+                                class="order-2 sm:order-1 w-full sm:w-auto px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all duration-200 font-medium" 
                                 onclick="showSection('details-section')">
                                 Back to Details
                             </button>
                             <button type="submit" 
-                                class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium">
+                                class="order-1 sm:order-2 w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium">
                                 Confirm Appointment
                             </button>
                         </div>

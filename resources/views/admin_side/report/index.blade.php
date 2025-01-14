@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Generate Reports</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo/system-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
