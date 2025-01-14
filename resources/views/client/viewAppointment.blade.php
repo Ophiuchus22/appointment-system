@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
 </head>
 <body class="bg-gray-100">
+    <div id="toast" class="fixed right-0 top-4 transform translate-x-full transition-transform duration-300 ease-in-out z-50"></div>
     <!-- Top Navigation Bar -->
     <div class="w-full bg-white border-b border-gray-100 px-4 py-3">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -65,25 +66,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- College Logo -->
-    <div class="fixed bottom-4 right-4 opacity-50">
-        @php
-            $college = Auth::user()->college ?? 'default';
-            $logos = [
-                'COLLEGE OF TEACHER EDUCATION' => 'cte.png',
-                'COLLEGE OF CRIMINAL JUSTICE' => 'ccj.png',
-                'COLLEGE OF BUSINESS EDUCATION' => 'cbe.png',
-                'COLLEGE OF ARTS AND SCIENCES' => 'cas.png',
-            ];
-            $logoFile = $logos[$college] ?? 'default.png';
-            $logoPath = public_path('logo/' . $logoFile);
-        @endphp
-        
-        @if(file_exists($logoPath))
-            <img src="{{ asset('logo/' . $logoFile) }}" alt="College Logo" class="w-32 h-32">
-        @endif
     </div>
 
     <div class="container mx-auto py-6 px-4">
@@ -164,6 +146,16 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                     </svg>
                                                     Edit
+                                                </button>
+
+                                                <!-- Remind Button -->
+                                                <button type="button" 
+                                                        onclick="remindAdmin({{ $appointment->id }})"
+                                                        class="inline-flex items-center text-yellow-600 hover:text-yellow-900">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                                    </svg>
+                                                    Remind
                                                 </button>
                                             @endif
                                             
@@ -306,9 +298,80 @@
                 }
             }
         });
+
+        function showNotification(type, message) {
+            const toast = document.getElementById('toast');
+            
+            // Create the notification content
+            const notificationHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm w-full border-l-4 ${type === 'success' ? 'border-green-500' : 'border-red-500'}">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            ${type === 'success' 
+                                ? `<svg class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                   </svg>`
+                                : `<svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                   </svg>`
+                            }
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium ${type === 'success' ? 'text-green-600' : 'text-red-600'}">
+                                ${message}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Set the HTML content
+            toast.innerHTML = notificationHTML;
+
+            // Show the toast
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+                toast.classList.add('translate-x-0');
+            }, 100);
+
+            // Hide the toast after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('translate-x-0');
+                toast.classList.add('translate-x-full');
+            }, 5000);
+        }
+
+        function remindAdmin(appointmentId) {
+            fetch(`/appointments/${appointmentId}/remind`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('success', data.message);
+                } else {
+                    showNotification('error', data.message || 'Error sending reminder');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('error', 'Error sending reminder');
+            });
+        }
     </script>
 
     @include('client.Modals.editModal')
     @include('client.Modals.confirmation_modal')
+
+    <style>
+    #toast {
+        transition: transform 0.3s ease-in-out;
+    }
+    </style>
 </body>
 </html>

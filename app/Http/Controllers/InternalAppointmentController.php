@@ -278,7 +278,7 @@ class InternalAppointmentController extends Controller
             ]);
 
             return back()->with('success', 'Appointment cancelled successfully.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             \Log::error('User cancellation error: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while cancelling the appointment');
         }
@@ -313,10 +313,59 @@ class InternalAppointmentController extends Controller
                 'success' => true,
                 'bookedTimes' => $bookedTimes
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching available times'
+            ], 500);
+        }
+    }
+
+    /**
+     * Send a reminder notification for a pending appointment
+     * 
+     * @param Appointment $appointment
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function remind(Appointment $appointment)
+    {
+        try {
+            // Check if appointment belongs to user
+            if ($appointment->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized action.'
+                ], 403);
+            }
+
+            // Check if appointment is pending
+            if ($appointment->status !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only pending appointments can be reminded.'
+                ], 400);
+            }
+
+            // Create new reminder notification
+            Notification::create([
+                'appointment_id' => $appointment->id,
+                'type' => 'manual_reminder',
+                'title' => 'Reminder: Pending Appointment',
+                'message' => "A client has sent a reminder for their pending appointment scheduled for " . 
+                            Carbon::parse($appointment->date)->format('M d, Y') . 
+                            " at " . Carbon::parse($appointment->time)->format('h:i A')
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Reminder sent successfully!'
+            ]);
+
+        } catch (Exception $e) {
+            \Log::error('Reminder error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while sending the reminder.'
             ], 500);
         }
     }

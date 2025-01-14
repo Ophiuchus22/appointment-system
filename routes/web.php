@@ -104,4 +104,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/reports/generate', [AdminReportController::class, 'generate'])->name('admin.reports.generate');
 });
 
+Route::post('/appointments/{appointment}/remind', [InternalAppointmentController::class, 'remind'])
+    ->name('appointments.remind');
+
 require __DIR__.'/auth.php';

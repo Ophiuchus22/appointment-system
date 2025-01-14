@@ -124,4 +124,16 @@ class Appointment extends Model
     {
         return $this->belongsTo(ExternalClient::class);
     }
+
+    /**
+     * Get the latest reminder for the appointment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latest_reminder()
+    {
+        return $this->hasOne(Notification::class)
+            ->where('type', 'manual_reminder')
+            ->latest();
+    }
 }

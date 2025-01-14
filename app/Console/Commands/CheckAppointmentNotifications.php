@@ -40,36 +40,10 @@ class CheckAppointmentNotifications extends Command
      */
     public function handle()
     {
-        // Check unconfirmed appointments (after 1 hour)
-        $this->checkUnconfirmedAppointments();
-
         // Check upcoming appointments (1 week, 24 hours, 1 hour before)
         $this->checkUpcomingAppointments();
 
         $this->info('Notifications check completed!');
-    }
-
-    /**
-     * Check and create notifications for unconfirmed appointments
-     * 
-     * Creates notifications for appointments that remain unconfirmed
-     * after one hour of creation
-     */
-    private function checkUnconfirmedAppointments()
-    {
-        Appointment::where('status', 'pending')
-            ->where('created_at', '<=', now()->subHour())
-            ->whereDoesntHave('notifications', function ($query) {
-                $query->where('type', 'unconfirmed');
-            })
-            ->each(function ($appointment) {
-                Notification::create([
-                    'appointment_id' => $appointment->id,
-                    'type' => 'unconfirmed',
-                    'title' => 'Unconfirmed Appointment',
-                    'message' => "Appointment scheduled for " . Carbon::parse($appointment->date)->format('M d, Y') . " at " . Carbon::parse($appointment->time)->format('h:i A') . " has been unconfirmed for over an hour."
-                ]);
-            });
     }
 
     /**
