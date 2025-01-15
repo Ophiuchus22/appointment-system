@@ -1,5 +1,5 @@
 @component('mail::message')
-# OFFICE OF THE ACADEMIC AFFAIRS
+# ACADEMIC AFFAIRS OFFICE
 
 Dear {{ $appointment->appointment_type === 'Internal' ? $appointment->user->name : $appointment->first_name }},
 
