@@ -272,6 +272,48 @@
         .contact-item i {
             font-size: 1.1rem;
         }
+
+        .mobile-contact-section {
+            display: block;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: 12px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .mobile-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .mobile-contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .mobile-contact-item i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        @media (min-width: 992px) {
+            .mobile-contact-section {
+                display: none;
+            }
+            
+            .login-image {
+                display: block;
+            }
+
+            .form-wrapper {
+                padding: 3rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -300,7 +342,7 @@
                     <p class="subtitle">Please sign in to your account</p>
                 </div>
 
-                <!-- Session Status -->
+                <!-- Session Status and Validation Errors -->
                 @if (session('status'))
                     <div class="alert alert-info" role="alert">
                         <i class="bi bi-info-circle-fill"></i>
@@ -354,6 +396,18 @@
                         <i class="bi bi-box-arrow-in-right me-2"></i>{{ __('Log in') }}
                     </button>
                 </form>
+
+                <!-- Mobile Contact Info - Moved to bottom -->
+                <div class="mobile-contact-section">
+                    <div class="mobile-contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <span>acad@rmmc.edu.ph</span>
+                    </div>
+                    <div class="mobile-contact-item">
+                        <i class="bi bi-telephone"></i>
+                        <span>0963-835-4416</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
