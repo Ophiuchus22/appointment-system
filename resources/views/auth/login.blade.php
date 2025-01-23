@@ -246,6 +246,32 @@
         .password-toggle:hover {
             color: var(--primary-color);
         }
+
+        .contact-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-section h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .contact-item i {
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -254,6 +280,17 @@
             <div class="image-content">
                 <h2>Academic Affairs Office</h2>
                 <p>Schedule your appointments efficiently with our online booking system.</p>
+                <div class="contact-section">
+                    <h4>Contact Information</h4>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <span>acad@rmmc.edu.ph</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-telephone"></i>
+                        <span>0963-835-4416</span>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="login-form">
