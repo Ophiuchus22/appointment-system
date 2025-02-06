@@ -57,7 +57,7 @@
         <div class="flex items-center gap-2">
             <img src="{{ asset('logo/system-logo-client.png') }}" alt="AppointEase Logo" class="h-10 w-10">
             <h1 class="text-2xl font-bold tracking-tight">
-                <span class="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent drop-shadow-sm">Appoint</span><span class="text-gray-800">Ease</span>
+                <span class="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent drop-shadow-sm">Acad</span><span class="text-gray-800">Ease</span>
             </h1>
         </div>
 
